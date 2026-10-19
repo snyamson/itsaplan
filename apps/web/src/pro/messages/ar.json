@@ -35,6 +35,19 @@
         "mcp": "MCP"
       },
       "instance": "المثيل"
+    },
+    "dashboard": {
+      "runs": "التشغيلات",
+      "failed": "فشلت",
+      "logged": "المسجّل",
+      "issues": "المهام",
+      "noRuns": "لم يعمل أي وكيل في هذه الفترة.",
+      "noSchedules": "لا توجد جداول بعد.",
+      "noTime": "لم يُسجَّل وقت في هذه الفترة.",
+      "noActivity": "لا نشاط في هذه الفترة.",
+      "paused": "متوقف",
+      "events": "{count, plural, zero {لا تغييرات} one {تغيير واحد} two {تغييران} few {# تغييرات} many {# تغييرًا} other {# تغيير}}",
+      "projectCount": "{count, plural, zero {لا مشاريع} one {مشروع واحد} two {مشروعان} few {# مشاريع} many {# مشروعًا} other {# مشروع}}"
     }
   }
 }

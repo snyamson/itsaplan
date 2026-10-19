@@ -7,12 +7,15 @@ import { errors } from '#shared/responses';
 import { WorkspaceResponse, workspaceParams } from '#modules/workspaces/model';
 import { createOwnWorkspace, getWorkspace, workspaceCreation } from '#modules/workspaces/service';
 import { exportAuditEvents, listAuditEvents, type AuditScope } from './audit-log';
+import { getWorkspaceDashboard } from './dashboard';
 import {
   AuditLogResponse,
   WorkspaceCreationResponse,
+  WorkspaceDashboardResponse,
   auditExportQuery,
   auditLogQuery,
   createWorkspaceBody,
+  dashboardQuery,
 } from './model';
 
 function csv(body: string, name: string): Response {
@@ -28,8 +31,9 @@ const exportName = (scope: AuditScope) =>
   `audit-log-${scope === 'instance' ? 'instance' : `workspace-${scope.workspaceId}`}-${new Date().toISOString().slice(0, 10)}.csv`;
 
 // The routes of the Pro features: workspaces a person creates beside the one sign-up made
-// them, up to the owned workspace limit that ./install.ts lifts, and the audit log that
-// ./audit.ts writes, read per workspace by its managers and for the instance by its owner.
+// them, up to the owned workspace limit that ./install.ts lifts; the dashboard of a
+// workspace; and the audit log that ./audit.ts writes, read per workspace by its managers
+// and for the instance by its owner.
 export const proRoutes = new Elysia({ name: 'pro', detail: { tags: ['Workspaces'] } })
   .use(authContext)
   .use(guards)
@@ -57,6 +61,23 @@ export const proRoutes = new Elysia({ name: 'pro', detail: { tags: ['Workspaces'
       detail: {
         summary: 'Create a workspace',
         description: 'Create a workspace you own. It starts with no teams.',
+      },
+    },
+  )
+
+  .get(
+    '/workspaces/:workspaceId/dashboard',
+    ({ standing, query }) => getWorkspaceDashboard(standing.workspaceId, query.days ?? 30),
+    {
+      workspaceManager: true,
+      params: workspaceParams,
+      query: dashboardQuery,
+      response: { 200: WorkspaceDashboardResponse, ...errors(400, 401, 404) },
+      detail: {
+        summary: 'Get the dashboard of a workspace',
+        description:
+          'What the teams and projects of the workspace did over a window, with the counts ' +
+          'that describe it now. Its owner and admins only.',
       },
     },
   )

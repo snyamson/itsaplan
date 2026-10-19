@@ -35,6 +35,19 @@
         "mcp": "MCP"
       },
       "instance": "Інстанс"
+    },
+    "dashboard": {
+      "runs": "Запуски",
+      "failed": "З помилкою",
+      "logged": "Обліковано",
+      "issues": "Задачі",
+      "noRuns": "За цей період агенти не запускалися.",
+      "noSchedules": "Розкладів поки немає.",
+      "noTime": "За цей період час не обліковувався.",
+      "noActivity": "За цей період активності не було.",
+      "paused": "На паузі",
+      "events": "{count, plural, one {# зміна} few {# зміни} many {# змін} other {# зміни}}",
+      "projectCount": "{count, plural, one {# проєкт} few {# проєкти} many {# проєктів} other {# проєкту}}"
     }
   }
 }

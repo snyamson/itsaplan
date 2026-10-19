@@ -35,6 +35,19 @@
         "mcp": "MCP"
       },
       "instance": "نمونه"
+    },
+    "dashboard": {
+      "runs": "اجراها",
+      "failed": "ناموفق",
+      "logged": "ثبت‌شده",
+      "issues": "کارها",
+      "noRuns": "در این بازه هیچ عاملی اجرا نشد.",
+      "noSchedules": "هنوز زمان‌بندی‌ای نیست.",
+      "noTime": "در این بازه زمانی ثبت نشد.",
+      "noActivity": "در این بازه فعالیتی نبود.",
+      "paused": "متوقف",
+      "events": "{count, plural, one {# تغییر} other {# تغییر}}",
+      "projectCount": "{count, plural, one {# پروژه} other {# پروژه}}"
     }
   }
 }

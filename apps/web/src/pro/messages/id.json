@@ -35,6 +35,19 @@
         "mcp": "MCP"
       },
       "instance": "Instans"
+    },
+    "dashboard": {
+      "runs": "Eksekusi",
+      "failed": "Gagal",
+      "logged": "Dicatat",
+      "issues": "Isu",
+      "noRuns": "Tidak ada agen yang berjalan dalam periode ini.",
+      "noSchedules": "Belum ada jadwal.",
+      "noTime": "Tidak ada waktu yang dicatat dalam periode ini.",
+      "noActivity": "Tidak ada aktivitas dalam periode ini.",
+      "paused": "Dijeda",
+      "events": "{count, plural, other {# perubahan}}",
+      "projectCount": "{count, plural, other {# proyek}}"
     }
   }
 }

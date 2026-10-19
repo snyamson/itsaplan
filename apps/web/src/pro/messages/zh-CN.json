@@ -35,6 +35,19 @@
         "mcp": "MCP"
       },
       "instance": "实例"
+    },
+    "dashboard": {
+      "runs": "运行",
+      "failed": "失败",
+      "logged": "已记录",
+      "issues": "事项",
+      "noRuns": "该时间段内没有智能体运行。",
+      "noSchedules": "还没有计划。",
+      "noTime": "该时间段内没有记录时间。",
+      "noActivity": "该时间段内没有活动。",
+      "paused": "已暂停",
+      "events": "{count, plural, other {# 次更改}}",
+      "projectCount": "{count, plural, other {# 个项目}}"
     }
   }
 }

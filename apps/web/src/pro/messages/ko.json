@@ -35,6 +35,19 @@
         "mcp": "MCP"
       },
       "instance": "인스턴스"
+    },
+    "dashboard": {
+      "runs": "실행",
+      "failed": "실패",
+      "logged": "기록됨",
+      "issues": "이슈",
+      "noRuns": "이 기간에 실행된 에이전트가 없습니다.",
+      "noSchedules": "아직 일정이 없습니다.",
+      "noTime": "이 기간에 기록된 시간이 없습니다.",
+      "noActivity": "이 기간에 활동이 없습니다.",
+      "paused": "일시 중지됨",
+      "events": "{count, plural, other {변경 #건}}",
+      "projectCount": "{count, plural, other {프로젝트 #개}}"
     }
   }
 }

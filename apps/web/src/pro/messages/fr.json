@@ -35,6 +35,19 @@
         "mcp": "MCP"
       },
       "instance": "Instance"
+    },
+    "dashboard": {
+      "runs": "Exécutions",
+      "failed": "Échouées",
+      "logged": "Saisi",
+      "issues": "Tickets",
+      "noRuns": "Aucun agent n'a été exécuté sur la période.",
+      "noSchedules": "Aucune planification pour le moment.",
+      "noTime": "Aucun temps saisi sur la période.",
+      "noActivity": "Aucune activité sur la période.",
+      "paused": "En pause",
+      "events": "{count, plural, one {# modification} other {# modifications}}",
+      "projectCount": "{count, plural, one {# projet} other {# projets}}"
     }
   }
 }
