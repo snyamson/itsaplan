@@ -1,5 +1,59 @@
 # Changelog
 
+## [1.6.0](https://github.com/snyamson/itsaplan/compare/v1.5.0...v1.6.0) (2026-10-19)
+
+
+### Features
+
+* a person can see and disconnect the MCP clients connected to their account ([#574](https://github.com/snyamson/itsaplan/issues/574)) ([ae65485](https://github.com/snyamson/itsaplan/commit/ae654859b493e0bf128dd82762b6ea6a49c8a907))
+* a separate public origin for incoming Git webhooks ([#592](https://github.com/snyamson/itsaplan/issues/592)) ([5c6ca8c](https://github.com/snyamson/itsaplan/commit/5c6ca8c17f2c202d3b482ebdd0ca71ba588c97c3))
+* **api:** get_current_user tells an MCP client whose key it holds ([#576](https://github.com/snyamson/itsaplan/issues/576)) ([1c86105](https://github.com/snyamson/itsaplan/commit/1c8610530b8ae6a89a69ac58e18b07fdc2efd523))
+* invites expire and can be renewed under a new link ([#541](https://github.com/snyamson/itsaplan/issues/541)) ([22f6952](https://github.com/snyamson/itsaplan/commit/22f69523a5691fcfad3c3adc52ecf6568d51b7f1))
+* limit new accounts to allowed email domains ([#567](https://github.com/snyamson/itsaplan/issues/567)) ([ba76b92](https://github.com/snyamson/itsaplan/commit/ba76b9204148935cb4cbdb3b2e1515c5422f9172))
+* team invites are emailed and can be sent again ([#555](https://github.com/snyamson/itsaplan/issues/555)) ([0768828](https://github.com/snyamson/itsaplan/commit/0768828b106ba99ccc621aafbdd46650b89ad76a))
+* the api reports each request to an extension, god mode takes groups of sections, names are transliterated ([#598](https://github.com/snyamson/itsaplan/issues/598)) ([92e8fe1](https://github.com/snyamson/itsaplan/commit/92e8fe16252ded78e9b49a22032b57f64928eeb5))
+* the instance mail provider can send through Microsoft 365 with OAuth ([#572](https://github.com/snyamson/itsaplan/issues/572)) ([e59b781](https://github.com/snyamson/itsaplan/commit/e59b7815582dde1a292186f5352d7ce26962c31d))
+* **web:** add Persian (fa) translation ([#551](https://github.com/snyamson/itsaplan/issues/551)) ([181f0d3](https://github.com/snyamson/itsaplan/commit/181f0d314a1c6f74cb6c7f70e6d46af3a81a12d8))
+* **web:** workspace settings and god mode show previews of the Cloud and Pro sections ([#599](https://github.com/snyamson/itsaplan/issues/599)) ([7cc9417](https://github.com/snyamson/itsaplan/commit/7cc94176228178ee72b47af118f3ae32a4831872))
+
+
+### Improvements
+
+* rebrand as Snyamson Desk, publish the fork's images and link its source ([cfa6f9c](https://github.com/snyamson/itsaplan/commit/cfa6f9cbc000763a70045a99aefac07207334f80))
+* the project switcher shows workspaces and teams in a side pane and searches projects on the server ([#600](https://github.com/snyamson/itsaplan/issues/600)) ([5335027](https://github.com/snyamson/itsaplan/commit/533502706787699ab93c40282c38f4154f68e67b))
+* **web:** browser tabs name the screen they show ([#594](https://github.com/snyamson/itsaplan/issues/594)) ([c66a061](https://github.com/snyamson/itsaplan/commit/c66a061a1f93afeb50d18decdc5eae1dc62acf46))
+* **web:** the MCP consent screen names the client that asks ([#578](https://github.com/snyamson/itsaplan/issues/578)) ([d098c72](https://github.com/snyamson/itsaplan/commit/d098c720edbee643bde85288e4f9ce954f475f95))
+
+
+### Bug Fixes
+
+* allow deleting additional backlog states ([#590](https://github.com/snyamson/itsaplan/issues/590)) ([bf52251](https://github.com/snyamson/itsaplan/commit/bf52251541ebeaa1cfe42855badf2bf72e99aa7c))
+* an MCP authorization error reaches the person instead of being lost ([#565](https://github.com/snyamson/itsaplan/issues/565)) ([9cf575e](https://github.com/snyamson/itsaplan/commit/9cf575e8b4cd7cb4f892c23b15c073fe402cf18c))
+* **auth:** turning password sign-in off also stops reset links ([#577](https://github.com/snyamson/itsaplan/issues/577)) ([6bd8d58](https://github.com/snyamson/itsaplan/commit/6bd8d58dc1254d75e87a8f084a6147be82b76402))
+* every team is in its owner's workspace ([#580](https://github.com/snyamson/itsaplan/issues/580)) ([fca1f8e](https://github.com/snyamson/itsaplan/commit/fca1f8ecdbce3f9bb5e368a44cf8a4c8192aa7d3))
+* **web:** a refused sign-up says why, in the visitor's language ([#553](https://github.com/snyamson/itsaplan/issues/553)) ([80a8683](https://github.com/snyamson/itsaplan/commit/80a868355a5b6c2377fed895bb60f759a870fea9))
+* **web:** the comment @ menu offers only agents a mention would start ([#570](https://github.com/snyamson/itsaplan/issues/570)) ([16bac83](https://github.com/snyamson/itsaplan/commit/16bac83a5e1201ee2fa3bd13817a99841a017fc3))
+* **web:** the Persian catalog carries the keys added after it was written ([#595](https://github.com/snyamson/itsaplan/issues/595)) ([a54d8c3](https://github.com/snyamson/itsaplan/commit/a54d8c3c4e88193777de0f75601d403c3b96bc1a))
+
+
+### Refactoring
+
+* **api:** let an extending build refuse internal agent work ([#557](https://github.com/snyamson/itsaplan/issues/557)) ([1e2e0d2](https://github.com/snyamson/itsaplan/commit/1e2e0d20f590000a0a9c8f5a46ca99ca26fd941c))
+
+
+### Build
+
+* **api:** the image no longer ships drizzle-kit, tsx and esbuild ([#560](https://github.com/snyamson/itsaplan/issues/560)) ([5fc48e9](https://github.com/snyamson/itsaplan/commit/5fc48e9f84f67fbc460f3886ea021c2e78c797ea))
+* **web:** the release image no longer ships npm, npx, corepack or yarn ([#559](https://github.com/snyamson/itsaplan/issues/559)) ([b73a118](https://github.com/snyamson/itsaplan/commit/b73a118cd43b0f324cbf6bbbd864cfc0e86db9ec))
+
+
+### Tests
+
+* **api:** flush agent traces before the next test resets the database ([#558](https://github.com/snyamson/itsaplan/issues/558)) ([c6941b2](https://github.com/snyamson/itsaplan/commit/c6941b2fab711a3ea5574d9cdd861031771d061f))
+* **api:** settle the import mapping before asserting its rejection ([#561](https://github.com/snyamson/itsaplan/issues/561)) ([d455060](https://github.com/snyamson/itsaplan/commit/d4550602f396febc974134bc0d24a4278b0b4831))
+* **api:** the current user test creates its project in a team ([#587](https://github.com/snyamson/itsaplan/issues/587)) ([a6fef7d](https://github.com/snyamson/itsaplan/commit/a6fef7daa9b6fde44cc167feb77b1bb38db863f4))
+* **api:** the held back run test no longer assumes which run goes first ([#579](https://github.com/snyamson/itsaplan/issues/579)) ([f70bff5](https://github.com/snyamson/itsaplan/commit/f70bff5284ea6057070e032f36cc8f36455a0d13))
+
 ## [1.5.0](https://github.com/croffasia/itsaplan/compare/v1.4.0...v1.5.0) (2026-10-13)
 
 
