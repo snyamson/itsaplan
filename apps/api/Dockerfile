@@ -52,6 +52,8 @@ FROM alpine:3.23 AS release
 WORKDIR /app
 ENV NODE_ENV=production
 ENV BUN_RUNTIME_TRANSPILER_CACHE_PATH=0
+# The Pro tables (packages/db/drizzle-pro), applied by migrate.ts after the core's.
+ENV BUILD_MIGRATIONS_DIR=/app/packages/db/drizzle-pro
 RUN apk add --no-cache libgcc libstdc++ postgresql18-client
 COPY --from=base /usr/local/bin/bun /usr/local/bin/
 COPY --from=install /app ./

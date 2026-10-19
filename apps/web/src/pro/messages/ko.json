@@ -1,0 +1,40 @@
+{
+  "pro": {
+    "workspaces": {
+      "title": "새 워크스페이스",
+      "namePlaceholder": "워크스페이스 이름",
+      "hint": "워크스페이스의 소유자가 됩니다. 만든 후에 팀을 추가하세요.",
+      "submit": "워크스페이스 만들기"
+    },
+    "auditLog": {
+      "searchPlaceholder": "사람, 작업, 위치 또는 주소로 검색",
+      "period": "기간",
+      "periods": {
+        "1": "최근 24시간",
+        "7": "최근 7일",
+        "30": "최근 30일",
+        "90": "최근 90일",
+        "all": "전체 기간"
+      },
+      "export": "CSV 내보내기",
+      "exportFailed": "감사 로그를 내보내지 못했습니다.",
+      "emptyTitle": "이벤트 없음",
+      "emptyHint": "변경 사항과 로그인이 발생하면 여기에 표시됩니다.",
+      "emptyFiltered": "이 기간에 검색과 일치하는 항목이 없습니다.",
+      "verbs": {
+        "POST": "생성",
+        "PUT": "설정",
+        "PATCH": "수정",
+        "DELETE": "삭제",
+        "other": "변경",
+        "sign_in": "로그인"
+      },
+      "via": {
+        "web": "웹",
+        "api_key": "API 키",
+        "mcp": "MCP"
+      },
+      "instance": "인스턴스"
+    }
+  }
+}

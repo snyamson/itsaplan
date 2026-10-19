@@ -4,7 +4,7 @@ import { setAuthSettings, setWorkspaceScim } from '@repo/auth';
 import { db, workspace } from '@repo/db';
 import { deleteAccount } from '#shared/account-deletion';
 import { setOwnedWorkspaceLimit } from '#shared/limits';
-import { apiKeyApi, app, authedApi, createProject } from '#tests/helpers/app';
+import { apiKeyApi, authedApi, createProject } from '#tests/helpers/app';
 import { createAgent } from '#tests/helpers/agents';
 import { signUpTestUser, type TestUser } from '#tests/helpers/auth';
 import { resetDb } from '#tests/helpers/db';
@@ -309,8 +309,8 @@ describe('workspaces', () => {
       ]);
     });
 
-    it('makes none for an AI agent, and no route creates one', async () => {
-      const { owner, ownerApi } = await setup();
+    it('makes none for an AI agent', async () => {
+      const { ownerApi } = await setup();
       await createProject(ownerApi, { key: 'MKT', name: 'Marketing' });
       const created = await createAgent(ownerApi, 'MKT', {
         name: 'Bot',
@@ -321,14 +321,6 @@ describe('workspaces', () => {
 
       const seen = (await bot.workspaces.get()).data!;
       expect(seen.filter((w) => w.role === 'owner')).toEqual([]);
-      const post = await app.handle(
-        new Request('http://localhost/workspaces', {
-          method: 'POST',
-          headers: { cookie: owner.cookie, 'content-type': 'application/json' },
-          body: JSON.stringify({ name: 'Second' }),
-        }),
-      );
-      expect(post.status).toBe(404);
     });
 
     it('goes with a deleted account while it holds no project', async () => {

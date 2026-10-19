@@ -5,8 +5,8 @@ import createNextIntlPlugin from 'next-intl/plugin';
 // Two paths that hold only while this repository is the workspace root. A build that
 // nests it under another one overrides them; unset, they are what they have always been.
 const tracingRoot = process.env.WEB_TRACING_ROOT ?? path.join(import.meta.dirname, '../../');
-// Where `@/cloud` resolves. Unset, tsconfig resolves it to src/ce, the stubs a
-// self-hosted instance runs.
+// Where `@/cloud` resolves. Unset, tsconfig resolves it to src/pro, this edition's
+// Pro features over the src/ce stubs.
 const cloudUiEntry = process.env.CLOUD_UI_ENTRY;
 
 // Fixed on every response. The Content-Security-Policy is not here: it names the api

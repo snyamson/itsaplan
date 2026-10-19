@@ -6,7 +6,7 @@ import { setRequestTracker, type TrackedAnswer, type TrackedRequest } from '../.
 
 interface Seen {
   request: Omit<TrackedRequest, 'request'> & { method: string };
-  answer?: Omit<TrackedAnswer, 'user'> & { userId: string | null };
+  answer?: Omit<TrackedAnswer, 'user' | 'context'> & { userId: string | null };
 }
 
 // Follows every request to a team route and records what the tracker was handed.

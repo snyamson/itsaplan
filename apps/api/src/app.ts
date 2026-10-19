@@ -94,6 +94,7 @@ export const app = new Elysia()
           { name: 'Projects', description: 'Projects and the full work items view' },
           { name: 'Teams', description: 'Teams that own projects' },
           { name: 'Workspaces', description: 'Workspaces that own teams, and who manages them' },
+          { name: 'Audit log', description: 'Who changed what, and who signed in' },
           { name: 'Members', description: 'Project membership and roles' },
           { name: 'Roles', description: 'Project roles and their permissions' },
           { name: 'Invites', description: 'Project invites (create, accept, reject)' },

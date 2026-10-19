@@ -1,0 +1,40 @@
+{
+  "pro": {
+    "workspaces": {
+      "title": "新建工作区",
+      "namePlaceholder": "工作区名称",
+      "hint": "你将成为它的所有者。创建后再添加团队。",
+      "submit": "创建工作区"
+    },
+    "auditLog": {
+      "searchPlaceholder": "按人员、操作、位置或地址搜索",
+      "period": "时间范围",
+      "periods": {
+        "1": "过去 24 小时",
+        "7": "过去 7 天",
+        "30": "过去 30 天",
+        "90": "过去 90 天",
+        "all": "全部时间"
+      },
+      "export": "导出 CSV",
+      "exportFailed": "无法导出审计日志。",
+      "emptyTitle": "暂无事件",
+      "emptyHint": "更改和登录发生时会显示在这里。",
+      "emptyFiltered": "该时间范围内没有与搜索匹配的内容。",
+      "verbs": {
+        "POST": "创建",
+        "PUT": "设置",
+        "PATCH": "更新",
+        "DELETE": "删除",
+        "other": "更改",
+        "sign_in": "登录"
+      },
+      "via": {
+        "web": "网页",
+        "api_key": "API 密钥",
+        "mcp": "MCP"
+      },
+      "instance": "实例"
+    }
+  }
+}

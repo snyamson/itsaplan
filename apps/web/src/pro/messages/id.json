@@ -1,0 +1,40 @@
+{
+  "pro": {
+    "workspaces": {
+      "title": "Ruang kerja baru",
+      "namePlaceholder": "Nama ruang kerja",
+      "hint": "Anda pemiliknya. Tambahkan timnya setelah ruang kerja dibuat.",
+      "submit": "Buat ruang kerja"
+    },
+    "auditLog": {
+      "searchPlaceholder": "Cari berdasarkan orang, tindakan, tempat, atau alamat",
+      "period": "Periode",
+      "periods": {
+        "1": "24 jam terakhir",
+        "7": "7 hari terakhir",
+        "30": "30 hari terakhir",
+        "90": "90 hari terakhir",
+        "all": "Semua waktu"
+      },
+      "export": "Ekspor CSV",
+      "exportFailed": "Log audit tidak dapat diekspor.",
+      "emptyTitle": "Tidak ada peristiwa",
+      "emptyHint": "Perubahan dan proses masuk muncul di sini saat terjadi.",
+      "emptyFiltered": "Tidak ada yang cocok dengan pencarian ini dalam periode tersebut.",
+      "verbs": {
+        "POST": "Membuat",
+        "PUT": "Menetapkan",
+        "PATCH": "Memperbarui",
+        "DELETE": "Menghapus",
+        "other": "Mengubah",
+        "sign_in": "Masuk"
+      },
+      "via": {
+        "web": "Web",
+        "api_key": "Kunci API",
+        "mcp": "MCP"
+      },
+      "instance": "Instans"
+    }
+  }
+}

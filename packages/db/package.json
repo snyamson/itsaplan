@@ -5,10 +5,12 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./schema": "./src/schema/index.ts"
+    "./schema": "./src/schema/index.ts",
+    "./schema/pro": "./src/schema/pro.ts"
   },
   "scripts": {
     "db:generate": "drizzle-kit generate",
+    "db:generate:pro": "drizzle-kit generate --config=drizzle.pro.config.ts",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "lint": "eslint .",

@@ -8,6 +8,7 @@ bun.lock
 
 # Generated Drizzle migrations and snapshots
 packages/db/drizzle
+packages/db/drizzle-pro
 
 # Generated better-auth schema
 packages/db/src/schema/auth.ts

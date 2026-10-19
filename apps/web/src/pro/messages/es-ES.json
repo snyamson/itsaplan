@@ -1,0 +1,40 @@
+{
+  "pro": {
+    "workspaces": {
+      "title": "Nuevo espacio de trabajo",
+      "namePlaceholder": "Nombre del espacio de trabajo",
+      "hint": "Serás su propietario. Añade sus equipos después de crearlo.",
+      "submit": "Crear espacio de trabajo"
+    },
+    "auditLog": {
+      "searchPlaceholder": "Busca por persona, acción, lugar o dirección",
+      "period": "Periodo",
+      "periods": {
+        "1": "Últimas 24 horas",
+        "7": "Últimos 7 días",
+        "30": "Últimos 30 días",
+        "90": "Últimos 90 días",
+        "all": "Todo"
+      },
+      "export": "Exportar CSV",
+      "exportFailed": "No se pudo exportar el registro de auditoría.",
+      "emptyTitle": "Sin eventos",
+      "emptyHint": "Los cambios y los inicios de sesión aparecen aquí cuando ocurren.",
+      "emptyFiltered": "Nada coincide con esta búsqueda en el periodo.",
+      "verbs": {
+        "POST": "Creó",
+        "PUT": "Estableció",
+        "PATCH": "Actualizó",
+        "DELETE": "Eliminó",
+        "other": "Cambió",
+        "sign_in": "Inició sesión"
+      },
+      "via": {
+        "web": "Web",
+        "api_key": "Clave de API",
+        "mcp": "MCP"
+      },
+      "instance": "Instancia"
+    }
+  }
+}

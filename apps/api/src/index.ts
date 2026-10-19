@@ -1,5 +1,8 @@
 import { app } from './app';
 import { startBackgroundJobs } from './background';
+import { installPro } from './modules/pro/install';
+
+installPro();
 
 // Bind the port. The app itself is assembled in ./app.ts (without `.listen()`)
 // so tests can import it and drive routes in memory.

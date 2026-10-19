@@ -23,6 +23,10 @@ export interface TrackedAnswer {
   user: SessionUser | null;
   // The handler's value; undefined when it returned a raw Response or failed.
   value: unknown;
+  // What the route's guards resolved for it, each where it has one: the `project` of a
+  // :projectKey route, the `projectId` of an entity, a team `membership`, a workspace
+  // `standing`. None of them where the request failed first.
+  context: Record<string, unknown>;
 }
 
 type FinishTracking = (answer: TrackedAnswer) => Promise<void>;
@@ -40,13 +44,27 @@ export function setRequestTracker(next?: RequestTracker): void {
 
 const pending = new WeakMap<Request, FinishTracking>();
 
+// The context of a hook, with what the guards of a route may have resolved on it.
+interface Resolved {
+  request: Request;
+  responseValue?: unknown;
+  set: { status?: unknown };
+  code?: unknown;
+  error?: unknown;
+  user?: SessionUser | null;
+  project?: unknown;
+  projectId?: unknown;
+  membership?: unknown;
+  standing?: unknown;
+}
+
 // Elysia reads a request's body only for the routes whose handler or hooks name `body`,
 // and a hook on every route that named it would read the body of each one, which leaves
 // nothing for a route that reads the raw request: better-auth, the git webhooks. Read by
 // a computed key, the body is what the route parsed for itself, or undefined.
 const BODY = ['bo', 'dy'].join('');
 
-function answerOf(value: unknown, status: unknown): Omit<TrackedAnswer, 'user'> {
+function answerOf(value: unknown, status: unknown): Pick<TrackedAnswer, 'status' | 'value'> {
   if (value instanceof Response) return { status: value.status, value: undefined };
   if (value instanceof ElysiaCustomStatusResponse) {
     return { status: Number(value.code), value: value.response };
@@ -57,13 +75,14 @@ function answerOf(value: unknown, status: unknown): Omit<TrackedAnswer, 'user'> 
 async function finishTracking(
   request: Request,
   user: SessionUser | null | undefined,
-  answer: Omit<TrackedAnswer, 'user'>,
+  context: Record<string, unknown>,
+  answer: Pick<TrackedAnswer, 'status' | 'value'>,
 ): Promise<void> {
   const finish = pending.get(request);
   if (!finish) return;
   pending.delete(request);
   try {
-    await finish({ ...answer, user: user ?? null });
+    await finish({ ...answer, user: user ?? null, context });
   } catch (error) {
     console.error('[request-tracker] with the answer:', error);
   }
@@ -84,16 +103,26 @@ export const requestTracking = new Elysia({ name: 'request-tracking' })
       console.error('[request-tracker] before the handler:', error);
     }
   })
-  .onAfterHandle({ as: 'global' }, (ctx) =>
-    finishTracking(
-      ctx.request,
-      (ctx as { user?: SessionUser | null }).user,
-      answerOf(ctx.responseValue, ctx.set.status),
-    ),
+  // Elysia reads the source of a hook to decide what a route parses, and a hook that
+  // passes its whole context on reads as one that needs the body. So what the guards
+  // resolved is destructured by name.
+  .onAfterHandle(
+    { as: 'global' },
+    ({ request, responseValue, set, user, project, projectId, membership, standing }: Resolved) =>
+      finishTracking(
+        request,
+        user,
+        { project, projectId, membership, standing },
+        answerOf(responseValue, set.status),
+      ),
   )
-  .onError({ as: 'global' }, (ctx) =>
-    finishTracking(ctx.request, (ctx as { user?: SessionUser | null }).user, {
-      status: errorAnswer(ctx.code, ctx.error).status,
-      value: undefined,
-    }),
+  .onError(
+    { as: 'global' },
+    ({ request, code, error, user, project, projectId, membership, standing }: Resolved) =>
+      finishTracking(
+        request,
+        user,
+        { project, projectId, membership, standing },
+        { status: errorAnswer(code, error).status, value: undefined },
+      ),
   );
