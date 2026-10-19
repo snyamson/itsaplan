@@ -16,8 +16,8 @@ not aid comprehension.
 
 ## Tokens (intent-named; values live in `globals.css`)
 
-Colors are OKLCH grayscale ramps with no brand hue; no surface sits on pure white or pure
-black. Light and dark are both first-class (`.dark` class toggles; the app ships a theme
+Colors are OKLCH grayscale ramps; the one brand hue is `primary`. No surface sits on pure
+white or pure black. Light and dark are both first-class (`.dark` class toggles; the app ships a theme
 switch).
 
 - `background` / `foreground` — page base and primary text.
@@ -27,8 +27,8 @@ switch).
 - `secondary` — the active/selected chip fill (tabs, toggles).
 - `accent` / `accent-foreground` — hover fill for interactive rows/buttons.
 - `border` — hairline; in dark it is `white / 10%`, i.e. a tint, never flat gray.
-- `primary` — high-contrast solid (primary buttons); near-black in light, near-white
-  in dark.
+- `primary` — high-contrast solid (primary buttons); Snyamson ink green (`#053d3a`) in
+  light, Snyamson sand (`#ffe2b8`) in dark.
 - `destructive` — error / overdue / delete only. It serves two roles at once: `text-destructive`
   on the page, and a fill under the white label of a destructive button or badge.
 - `warning` — a state that needs attention but has refused nothing, where `destructive` would

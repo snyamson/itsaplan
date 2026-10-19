@@ -18,6 +18,7 @@
   "apiDocs": "Documentation de l'API",
   "api": "API",
   "mcpServer": "Serveur MCP",
+  "sourceCode": "Code source",
   "godMode": "God mode",
   "godModeSection": "God mode : {section}",
   "instanceSettings": "Paramètres de l'instance",

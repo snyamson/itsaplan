@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { Braces, Server, Shield } from 'lucide-react';
+import { Braces, Code, Server, Shield } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import type { Project } from '@/lib/api/endpoints/projects';
 import { useSession } from '@/lib/auth-client';
+import { APP_SITE_URL } from '@/utils/app';
 import { apiDocsPath, godPath, mcpServerPath } from '@/utils/paths';
 import { GOD_SECTIONS } from '@/utils/godSections';
 import { useSettingsNavGroups } from '@/hooks/useSettingsNavGroups';
@@ -28,7 +29,7 @@ import SidebarBrandFooter from '@/components/brand/SidebarBrandFooter';
 // The app sidebar. It has two modes driven by the route: the main work
 // navigation, and the project settings navigation reached through the "Project
 // settings" entry. The project switcher header and the footer (API docs, MCP
-// server, brand mark) are shared by both modes. Creating and deleting a project
+// server, source code, brand mark) are shared by both modes. Creating and deleting a project
 // live in the team panel on Manage teams, not here.
 export default function AppSidebar({
   projects,
@@ -97,6 +98,14 @@ export default function AppSidebar({
                 label={t('mcpServer')}
                 active={onMcp}
                 disabled={disabled}
+              />
+              {/* AGPL-3.0 section 13: everyone who uses the instance can get its source. */}
+              <SidebarNavItem
+                href={APP_SITE_URL}
+                icon={Code}
+                label={t('sourceCode')}
+                active={false}
+                disabled={false}
               />
               {/* Instance administration, only for the owner account. The API
                   enforces the same, so hiding it here is about noise, not access. */}

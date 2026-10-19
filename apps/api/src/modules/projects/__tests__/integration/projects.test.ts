@@ -11,7 +11,6 @@ import { clearLimits, setLimits } from '#tests/helpers/limits';
 // Requires the test DB to be up and migrated:
 //   cp .env.test.example .env.test
 //   bun run db:migrate:test
-// See apps/api/AGENTS.md "Tests" for the setup.
 //
 // The projects feature owns five routes: list, create, copy, the full work-items
 // view, and delete. createProject seeds five default columns (one per state type)

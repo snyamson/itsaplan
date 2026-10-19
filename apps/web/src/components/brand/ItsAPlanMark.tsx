@@ -1,7 +1,6 @@
-// The "It's a Plan" brand mark: two shapes in tandem — a filled circle (the human/team)
-// and an outlined square (the agent), joined by a short link. Roles read from the shapes
-// themselves, so the mark works in a single color via currentColor and stays legible at
-// small sizes. Decorative — the caller sets size/color via className.
+// The Snyamson Desk brand mark: the Snyamson tile and S over a sand rule, the same
+// shapes as the favicon in `app/icon.svg`. It keeps its own colours on every background.
+// Decorative — the caller sets the size via className.
 export default function ItsAPlanMark({ className }: { className?: string }) {
   return (
     <svg
@@ -11,18 +10,15 @@ export default function ItsAPlanMark({ className }: { className?: string }) {
       className={className}
       aria-hidden="true"
     >
-      <rect x="13" y="14.3" width="6" height="3.4" rx="1.7" fill="currentColor" opacity="0.4" />
-      <circle cx="9.5" cy="16" r="6" fill="currentColor" />
-      <rect
-        x="17"
-        y="10.5"
-        width="11"
-        height="11"
-        rx="3.4"
-        fill="none"
-        stroke="currentColor"
+      <rect width="32" height="32" rx="7" fill="#053D3A" />
+      <path
+        d="M22 9H13.6a2.6 2.6 0 0 0 0 5.2h4.8a2.6 2.6 0 0 1 0 5.2H10"
+        stroke="#FFE2B8"
         strokeWidth="3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
+      <path d="M10 24.2H22" stroke="#F0C177" strokeWidth="2" strokeLinecap="round" />
     </svg>
   );
 }

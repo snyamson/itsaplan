@@ -18,6 +18,7 @@
   "apiDocs": "API 문서",
   "api": "API",
   "mcpServer": "MCP 서버",
+  "sourceCode": "소스 코드",
   "godMode": "최고 관리자 모드",
   "godModeSection": "최고 관리자 모드: {section}",
   "instanceSettings": "인스턴스 설정",

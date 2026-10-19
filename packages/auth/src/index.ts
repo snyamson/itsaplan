@@ -847,7 +847,7 @@ function createAuth() {
       // then used to sign in (signIn.passkey). Adds the `passkey` table.
       passkey({
         rpID: passkeyRpID,
-        rpName: process.env.PASSKEY_RP_NAME ?? "It's a Plan",
+        rpName: process.env.PASSKEY_RP_NAME ?? 'Snyamson Desk',
         // Expected origin(s) of the WebAuthn ceremony — the frontend origins.
         origin: trustedOrigins,
       }),

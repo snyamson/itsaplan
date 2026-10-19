@@ -18,6 +18,7 @@
   "apiDocs": "API 文档",
   "api": "API",
   "mcpServer": "MCP 服务器",
+  "sourceCode": "源代码",
   "godMode": "管理模式",
   "godModeSection": "管理模式：{section}",
   "instanceSettings": "实例设置",

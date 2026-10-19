@@ -104,7 +104,7 @@ export async function getImportJobDto(id: number): Promise<ImportJobDto | null> 
 }
 
 // Not paged: a project accumulates at most a handful of import jobs, never a list
-// long enough to need it (see apps/api/AGENTS.md's paged-vs-whole-list rule).
+// long enough to need it.
 export async function listImportJobs(projectId: number): Promise<ImportJobDto[]> {
   const rows = await db
     .select()
@@ -323,7 +323,7 @@ interface PlaneStateListEnvelope {
 
 // Mirrors apps/worker/src/plane-adapter.ts's STATE_CATEGORY_MAP/normalizeStateCategory:
 // duplicated here rather than imported, since the api does not depend on the worker
-// (see root AGENTS.md's dependency graph) - the same reasoning as testPlaneConnection
+// - the same reasoning as testPlaneConnection
 // above already re-implementing its own small Plane fetch.
 const STATE_CATEGORY_MAP: Record<string, StateCategory> = {
   backlog: 'backlog',

@@ -35,9 +35,6 @@ packages/mailer SMTP and Resend transport
 Dependency direction is `api → @repo/auth → @repo/db`. The web app never imports the
 packages directly, it talks to the API over HTTP.
 
-Each app and package has a `AGENTS.md` with the rules that apply inside it. Read the one
-for the area you are changing.
-
 ## Code conventions
 
 - **KISS and YAGNI.** The simplest thing that works. No abstraction until more than one
@@ -64,7 +61,6 @@ run `bun run auth:generate` first, then generate the migration.
 ### Tests
 
 `apps/api` has an integration suite that runs against a real Postgres, not mocks. See
-`apps/api/AGENTS.md` for how to write one, and
 [docs/development.md](docs/development.md#tests) for how to run the suite and the CI gate.
 
 ## Pull requests

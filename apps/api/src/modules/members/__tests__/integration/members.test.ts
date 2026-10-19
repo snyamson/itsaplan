@@ -8,8 +8,7 @@ import { createRole, listProjectRoles } from '#tests/helpers/roles';
 // one from the team that owns it, assigning a custom role to a member (owner only),
 // and removing a member or leaving the project. Someone outside the team joins
 // through an invite, so the tests add a second member by creating and accepting one.
-// Real sessions against the real (test) database. See apps/api/AGENTS.md "Tests" for
-// setup.
+// Real sessions against the real (test) database.
 
 type Actor = { user: TestUser; api: ReturnType<typeof authedApi> };
 

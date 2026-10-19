@@ -18,6 +18,7 @@
   "apiDocs": "توثيق واجهة البرمجة (API)",
   "api": "واجهة البرمجة (API)",
   "mcpServer": "خادم MCP",
+  "sourceCode": "الشيفرة المصدرية",
   "godMode": "وضع المشرف",
   "godModeSection": "وضع المشرف: {section}",
   "instanceSettings": "إعدادات المثيل",

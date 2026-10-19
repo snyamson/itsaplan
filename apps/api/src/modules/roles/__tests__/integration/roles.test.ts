@@ -11,7 +11,6 @@ import { createAgent, setAgentProjectRole } from '#tests/helpers/agents';
 // team's projects assign to their members; every team starts with one default
 // "Member" role. Managing them is team-owner-only and deliberately not delegated
 // through the permission matrix. Real sessions against the real (test) database.
-// See apps/api/AGENTS.md "Tests".
 
 type Actor = { user: TestUser; api: ReturnType<typeof authedApi>; teamId: number };
 

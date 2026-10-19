@@ -111,7 +111,6 @@ the migration. `rev_checklist_item()` is the example to copy: it goes from
 A new kind of scope touches two more places: the entry in `scopeKind` in
 `apps/api/src/sync/store.ts`, which names it, makes the API accept it, and says which resource a
 watcher must be allowed to read, and the mirror in `apps/web/src/utils/revScopes.ts`.
-`packages/db/AGENTS.md` keeps the same recipe next to the schema.
 
 ## Four rules before you touch the triggers
 

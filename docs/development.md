@@ -66,7 +66,7 @@ docker compose -f docker-compose.test.yml build
 docker compose -f docker-compose.test.yml run --rm api-test
 ```
 
-The integration suite is in `apps/api`. `apps/api/AGENTS.md` explains how to write a test.
+The integration suite is in `apps/api`.
 
 The mechanisms that span several apps — the revision engine, the interface languages — are
 described in [`docs/dev/`](dev/).

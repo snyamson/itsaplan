@@ -7,8 +7,7 @@ import { clearLimits, setLimits } from '#tests/helpers/limits';
 
 // Integration coverage for the invites feature: the routes that create/list/revoke
 // invites into a project and into a team, and the invitee-side routes that read,
-// accept, or reject a token. Real sessions against the real (test) database. See
-// apps/api/AGENTS.md "Tests" for setup.
+// accept, or reject a token. Real sessions against the real (test) database.
 
 // Creates a project MKT owned by a fresh user and returns a Treaty client acting
 // as that owner. The first user in a reset DB is "god"; the owner still reaches

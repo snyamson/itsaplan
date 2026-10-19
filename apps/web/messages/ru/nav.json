@@ -18,6 +18,7 @@
   "apiDocs": "Документация API",
   "api": "API",
   "mcpServer": "MCP-сервер",
+  "sourceCode": "Исходный код",
   "godMode": "Режим администратора",
   "godModeSection": "Режим администратора: {section}",
   "instanceSettings": "Настройки инстанса",

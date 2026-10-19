@@ -787,7 +787,7 @@ function providerWebhookApi(
       url: (hook) => text(hook?.url),
       id: (hook) => text(hook?.uuid),
       body: () => ({
-        description: "It's a Plan",
+        description: 'Snyamson Desk',
         url: payloadUrl,
         active: true,
         secret,
