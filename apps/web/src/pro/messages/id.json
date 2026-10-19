@@ -48,6 +48,10 @@
       "paused": "Dijeda",
       "events": "{count, plural, other {# perubahan}}",
       "projectCount": "{count, plural, other {# proyek}}"
+    },
+    "emailDomains": {
+      "saved": "Domain email disimpan",
+      "invalid": "Masukkan domain seperti example.com, dipisahkan dengan koma."
     }
   }
 }

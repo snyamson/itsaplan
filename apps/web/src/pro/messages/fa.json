@@ -48,6 +48,10 @@
       "paused": "متوقف",
       "events": "{count, plural, one {# تغییر} other {# تغییر}}",
       "projectCount": "{count, plural, one {# پروژه} other {# پروژه}}"
+    },
+    "emailDomains": {
+      "saved": "دامنه‌های ایمیل ذخیره شد",
+      "invalid": "دامنه‌هایی مانند example.com را با ویرگول جدا کنید."
     }
   }
 }

@@ -48,6 +48,10 @@
       "paused": "متوقف",
       "events": "{count, plural, zero {لا تغييرات} one {تغيير واحد} two {تغييران} few {# تغييرات} many {# تغييرًا} other {# تغيير}}",
       "projectCount": "{count, plural, zero {لا مشاريع} one {مشروع واحد} two {مشروعان} few {# مشاريع} many {# مشروعًا} other {# مشروع}}"
+    },
+    "emailDomains": {
+      "saved": "تم حفظ نطاقات البريد",
+      "invalid": "أدخل نطاقات مثل example.com مفصولة بفواصل."
     }
   }
 }

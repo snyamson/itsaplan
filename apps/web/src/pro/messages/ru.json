@@ -48,6 +48,10 @@
       "paused": "На паузе",
       "events": "{count, plural, one {# изменение} few {# изменения} many {# изменений} other {# изменения}}",
       "projectCount": "{count, plural, one {# проект} few {# проекта} many {# проектов} other {# проекта}}"
+    },
+    "emailDomains": {
+      "saved": "Почтовые домены сохранены",
+      "invalid": "Введите домены вида example.com через запятую."
     }
   }
 }

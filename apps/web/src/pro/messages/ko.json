@@ -48,6 +48,10 @@
       "paused": "일시 중지됨",
       "events": "{count, plural, other {변경 #건}}",
       "projectCount": "{count, plural, other {프로젝트 #개}}"
+    },
+    "emailDomains": {
+      "saved": "이메일 도메인을 저장했습니다",
+      "invalid": "example.com처럼 도메인을 쉼표로 구분해 입력하세요."
     }
   }
 }

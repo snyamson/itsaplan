@@ -24,6 +24,10 @@ export const cloudMessages = {
       events: '{count, plural, one {# change} other {# changes}}',
       projectCount: '{count, plural, one {# project} other {# projects}}',
     },
+    emailDomains: {
+      saved: 'Email domains saved',
+      invalid: 'Enter domains like example.com, separated by commas.',
+    },
     auditLog: {
       searchPlaceholder: 'Search by person, action, place or address',
       period: 'Period',

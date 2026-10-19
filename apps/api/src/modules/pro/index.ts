@@ -8,14 +8,17 @@ import { WorkspaceResponse, workspaceParams } from '#modules/workspaces/model';
 import { createOwnWorkspace, getWorkspace, workspaceCreation } from '#modules/workspaces/service';
 import { exportAuditEvents, listAuditEvents, type AuditScope } from './audit-log';
 import { getWorkspaceDashboard } from './dashboard';
+import { listEmailDomains, setEmailDomains } from './email-domains';
 import {
   AuditLogResponse,
+  EmailDomainsResponse,
   WorkspaceCreationResponse,
   WorkspaceDashboardResponse,
   auditExportQuery,
   auditLogQuery,
   createWorkspaceBody,
   dashboardQuery,
+  emailDomainsBody,
 } from './model';
 
 function csv(body: string, name: string): Response {
@@ -78,6 +81,40 @@ export const proRoutes = new Elysia({ name: 'pro', detail: { tags: ['Workspaces'
         description:
           'What the teams and projects of the workspace did over a window, with the counts ' +
           'that describe it now. Its owner and admins only.',
+      },
+    },
+  )
+
+  .get(
+    '/workspaces/:workspaceId/email-domains',
+    async ({ standing }) => ({ domains: await listEmailDomains(standing.workspaceId) }),
+    {
+      workspaceOwner: true,
+      params: workspaceParams,
+      response: { 200: EmailDomainsResponse, ...errors(401, 403, 404) },
+      detail: {
+        summary: 'List the email domains of a workspace',
+        description:
+          'The domains whose addresses its teams invite and its SCIM provisions. None means ' +
+          "the instance's rules apply. Its owner only.",
+      },
+    },
+  )
+
+  .put(
+    '/workspaces/:workspaceId/email-domains',
+    async ({ standing, body }) => ({
+      domains: await setEmailDomains(standing.workspaceId, body.domains),
+    }),
+    {
+      workspaceOwner: true,
+      params: workspaceParams,
+      body: emailDomainsBody,
+      response: { 200: EmailDomainsResponse, ...errors(400, 401, 403, 404) },
+      detail: {
+        summary: 'Set the email domains of a workspace',
+        description:
+          'Replace the domains. People already in its teams keep their access. Its owner only.',
       },
     },
   )

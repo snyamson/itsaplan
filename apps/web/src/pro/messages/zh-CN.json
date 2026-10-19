@@ -48,6 +48,10 @@
       "paused": "已暂停",
       "events": "{count, plural, other {# 次更改}}",
       "projectCount": "{count, plural, other {# 个项目}}"
+    },
+    "emailDomains": {
+      "saved": "已保存邮箱域名",
+      "invalid": "请输入 example.com 这样的域名，用逗号分隔。"
     }
   }
 }

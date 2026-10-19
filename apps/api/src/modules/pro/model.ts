@@ -1,5 +1,6 @@
 import { t } from 'elysia';
 import { pageQueryFields, pageResponse } from '#shared/pagination';
+import { EmailDomains } from '#modules/god/model';
 
 export const WorkspaceCreationResponse = t.Object({
   allowed: t.Boolean(),
@@ -97,3 +98,7 @@ export const WorkspaceDashboardResponse = t.Object({
     t.Object({ teamId: t.Number(), name: t.String(), projects: t.Number(), events: t.Number() }),
   ),
 });
+
+export const emailDomainsBody = t.Object({ domains: EmailDomains });
+
+export const EmailDomainsResponse = t.Object({ domains: t.Array(t.String()) });

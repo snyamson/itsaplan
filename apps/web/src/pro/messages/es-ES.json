@@ -48,6 +48,10 @@
       "paused": "En pausa",
       "events": "{count, plural, one {# cambio} other {# cambios}}",
       "projectCount": "{count, plural, one {# proyecto} other {# proyectos}}"
+    },
+    "emailDomains": {
+      "saved": "Dominios de correo guardados",
+      "invalid": "Escribe dominios como example.com, separados por comas."
     }
   }
 }

@@ -1,7 +1,15 @@
 // Tables of the Pro features. They are kept out of ./index.ts and migrated from
 // ../../drizzle-pro (drizzle.pro.config.ts), which the migrate step applies after the
 // core's as the build's own migrations, so the core's migration history stays upstream's.
-import { bigserial, index, integer, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import {
+  bigserial,
+  index,
+  integer,
+  pgTable,
+  primaryKey,
+  text,
+  timestamp,
+} from 'drizzle-orm/pg-core';
 import { workspace } from './app';
 import { user } from './auth';
 
@@ -32,5 +40,23 @@ export const auditEvent = pgTable(
     index('audit_event_workspace_created_idx').on(t.workspaceId, t.createdAt),
     index('audit_event_created_idx').on(t.createdAt),
     index('audit_event_actor_idx').on(t.actorId),
+  ],
+);
+
+// The email domains a workspace admits. With any listed, an address at none of them is
+// not invited into its teams nor provisioned by its SCIM, and one it invited may sign up
+// at them; with none, the instance's rules apply.
+export const workspaceEmailDomain = pgTable(
+  'workspace_email_domain',
+  {
+    workspaceId: integer('workspace_id')
+      .notNull()
+      .references(() => workspace.id, { onDelete: 'cascade' }),
+    domain: text('domain').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.workspaceId, t.domain] }),
+    index('workspace_email_domain_domain_idx').on(t.domain),
   ],
 );

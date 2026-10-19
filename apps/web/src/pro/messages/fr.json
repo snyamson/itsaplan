@@ -48,6 +48,10 @@
       "paused": "En pause",
       "events": "{count, plural, one {# modification} other {# modifications}}",
       "projectCount": "{count, plural, one {# projet} other {# projets}}"
+    },
+    "emailDomains": {
+      "saved": "Domaines de messagerie enregistrés",
+      "invalid": "Saisissez des domaines comme example.com, séparés par des virgules."
     }
   }
 }
