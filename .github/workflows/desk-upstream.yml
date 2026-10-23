@@ -1,0 +1,129 @@
+name: Upstream sync
+
+# Once a day, looks for a new stable release of croffasia/itsaplan and opens a pull request
+# that merges it into main. The pull request merges itself once every check passes; it
+# waits for a person when a rule below holds it back:
+#
+#   - a major release (the first number changes) always waits;
+#   - a conflict outside the tooling files this fork keeps out of the repository stops the
+#     sync, and an issue names the files;
+#   - the required checks on main (format, lint, typecheck, the build and the test suite)
+#     must pass before the merge goes through.
+#
+# The pull request is opened with UPSTREAM_SYNC_TOKEN, a fine-grained token of the
+# repository owner: a pull request opened with GITHUB_TOKEN starts no workflow run, so CI
+# would never check it, and the merge it makes would not start the image build either.
+on:
+  schedule:
+    - cron: '17 5 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: upstream-sync
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    name: Merge the newest upstream release
+    runs-on: ubuntu-24.04
+    env:
+      GH_TOKEN: ${{ secrets.UPSTREAM_SYNC_TOKEN }}
+      UPSTREAM: croffasia/itsaplan
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.UPSTREAM_SYNC_TOKEN }}
+
+      - name: Find a release that is not merged yet
+        id: release
+        run: |
+          set -euo pipefail
+          # Without a tag, `gh release view` reads the latest release, which is never a
+          # draft or a prerelease.
+          tag=$(gh release view -R "$UPSTREAM" --json tagName --jq .tagName)
+          git remote add upstream "https://github.com/$UPSTREAM.git"
+          git fetch --quiet --no-tags upstream "refs/tags/$tag:refs/tags/$tag"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          if git merge-base --is-ancestor "$tag" HEAD; then
+            echo "$tag is merged already."
+            echo "pending=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ -n "$(gh pr list --head "upstream/$tag" --state open --json number --jq '.[]')" ]; then
+            echo "A pull request for $tag is open already."
+            echo "pending=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          current=$(jq -r '."."' .release-please-manifest.json)
+          next=${tag#v}
+          if [ "${next%%.*}" != "${current%%.*}" ]; then major=true; else major=false; fi
+          echo "pending=true" >> "$GITHUB_OUTPUT"
+          echo "major=$major" >> "$GITHUB_OUTPUT"
+          echo "current=$current" >> "$GITHUB_OUTPUT"
+
+      - name: Merge it on a branch of its own
+        if: steps.release.outputs.pending == 'true'
+        id: merge
+        env:
+          TAG: ${{ steps.release.outputs.tag }}
+        run: |
+          set -euo pipefail
+          git config user.name snyamson
+          git config user.email info.snyamson@gmail.com
+          git switch -c "upstream/$TAG"
+          git merge --no-ff --no-commit "$TAG" || true
+
+          # The fork keeps upstream's tooling files out of the repository: a change upstream
+          # makes to one is a modify/delete conflict, and one it adds is staged as new.
+          tooling='^(\.agents/|\.claude/|(.*/)?(AGENTS|CLAUDE)\.md$)'
+          git diff --name-only --diff-filter=U | grep -E "$tooling" | xargs -r git rm -q --cached --ignore-unmatch
+          git ls-files | grep -E "$tooling" | xargs -r git rm -q --cached
+
+          conflicts=$(git diff --name-only --diff-filter=U)
+          if [ -n "$conflicts" ]; then
+            git merge --abort
+            {
+              echo "Merging upstream $TAG into main conflicts in these files, so the sync stopped:"
+              echo
+              echo "$conflicts" | sed 's/^/- `/; s/$/`/'
+              echo
+              echo "Merge the tag by hand, resolve them, and push to main."
+            } > conflict.md
+            gh issue create --title "Upstream $TAG needs a manual merge" --body-file conflict.md
+            echo "merged=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          git commit -q -m "chore: merge upstream $TAG"
+          if git ls-files | grep -qE "$tooling"; then
+            echo "::error::A tooling file is still tracked after the merge."
+            exit 1
+          fi
+          git push --quiet origin "upstream/$TAG"
+          echo "merged=true" >> "$GITHUB_OUTPUT"
+
+      - name: Open the pull request
+        if: steps.merge.outputs.merged == 'true'
+        env:
+          TAG: ${{ steps.release.outputs.tag }}
+          MAJOR: ${{ steps.release.outputs.major }}
+          CURRENT: ${{ steps.release.outputs.current }}
+        run: |
+          set -euo pipefail
+          {
+            echo "Merges upstream [$TAG](https://github.com/$UPSTREAM/releases/tag/$TAG) into main (from $CURRENT)."
+            echo
+            if [ "$MAJOR" = true ]; then
+              echo "**A major release: this pull request waits for a review.** Read the release notes for breaking changes before merging."
+            else
+              echo "It merges itself once the required checks pass."
+            fi
+          } > body.md
+          url=$(gh pr create --base main --head "upstream/$TAG" --title "chore: merge upstream $TAG" --body-file body.md)
+          # A merge commit, not a squash: the next merge from upstream then starts from
+          # this one instead of conflicting with every commit again.
+          if [ "$MAJOR" != true ]; then gh pr merge "$url" --auto --merge; fi
