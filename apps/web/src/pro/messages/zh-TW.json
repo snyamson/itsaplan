@@ -1,0 +1,57 @@
+{
+  "pro": {
+    "workspaces": {
+      "title": "新增工作區",
+      "namePlaceholder": "工作區名稱",
+      "hint": "你是這個工作區的擁有者。建立後再加入團隊。",
+      "submit": "建立工作區"
+    },
+    "dashboard": {
+      "runs": "執行",
+      "failed": "失敗",
+      "logged": "已記錄",
+      "issues": "事項",
+      "noRuns": "此期間沒有代理執行。",
+      "noSchedules": "尚無排程。",
+      "noTime": "此期間沒有記錄時間。",
+      "noActivity": "此期間沒有活動。",
+      "paused": "已暫停",
+      "events": "{count, plural, other {# 次變更}}",
+      "projectCount": "{count, plural, other {# 個專案}}"
+    },
+    "emailDomains": {
+      "saved": "已儲存電子郵件網域",
+      "invalid": "請輸入 example.com 這類網域，以逗號分隔。"
+    },
+    "auditLog": {
+      "searchPlaceholder": "依人員、操作、位置或位址搜尋",
+      "period": "期間",
+      "periods": {
+        "1": "過去 24 小時",
+        "7": "過去 7 天",
+        "30": "過去 30 天",
+        "90": "過去 90 天",
+        "all": "全部時間"
+      },
+      "export": "匯出 CSV",
+      "exportFailed": "無法匯出稽核記錄。",
+      "instance": "執行個體",
+      "emptyTitle": "沒有事件",
+      "emptyHint": "變更和登入發生時會顯示在這裡。",
+      "emptyFiltered": "此期間沒有符合搜尋的內容。",
+      "verbs": {
+        "POST": "建立",
+        "PUT": "設定",
+        "PATCH": "更新",
+        "DELETE": "刪除",
+        "other": "變更",
+        "sign_in": "登入"
+      },
+      "via": {
+        "web": "網頁",
+        "api_key": "API 金鑰",
+        "mcp": "MCP"
+      }
+    }
+  }
+}

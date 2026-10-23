@@ -1,0 +1,57 @@
+{
+  "pro": {
+    "workspaces": {
+      "title": "Yeni çalışma alanı",
+      "namePlaceholder": "Çalışma alanı adı",
+      "hint": "Çalışma alanının sahibi sizsiniz. Ekiplerini oluşturduktan sonra ekleyin.",
+      "submit": "Çalışma alanı oluştur"
+    },
+    "dashboard": {
+      "runs": "Çalıştırmalar",
+      "failed": "Başarısız",
+      "logged": "Kaydedilen",
+      "issues": "İşler",
+      "noRuns": "Bu dönemde hiçbir ajan çalışmadı.",
+      "noSchedules": "Henüz zamanlama yok.",
+      "noTime": "Bu dönemde süre kaydedilmedi.",
+      "noActivity": "Bu dönemde etkinlik yok.",
+      "paused": "Duraklatıldı",
+      "events": "{count, plural, one {# değişiklik} other {# değişiklik}}",
+      "projectCount": "{count, plural, one {# proje} other {# proje}}"
+    },
+    "emailDomains": {
+      "saved": "E-posta alan adları kaydedildi",
+      "invalid": "example.com gibi alan adlarını virgülle ayırarak girin."
+    },
+    "auditLog": {
+      "searchPlaceholder": "Kişi, işlem, yer veya adrese göre ara",
+      "period": "Dönem",
+      "periods": {
+        "1": "Son 24 saat",
+        "7": "Son 7 gün",
+        "30": "Son 30 gün",
+        "90": "Son 90 gün",
+        "all": "Tüm zamanlar"
+      },
+      "export": "CSV olarak dışa aktar",
+      "exportFailed": "Denetim günlüğü dışa aktarılamadı.",
+      "instance": "Sunucu",
+      "emptyTitle": "Olay yok",
+      "emptyHint": "Değişiklikler ve girişler gerçekleştikçe burada görünür.",
+      "emptyFiltered": "Bu dönemde aramayla eşleşen bir şey yok.",
+      "verbs": {
+        "POST": "Oluşturdu",
+        "PUT": "Ayarladı",
+        "PATCH": "Güncelledi",
+        "DELETE": "Sildi",
+        "other": "Değiştirdi",
+        "sign_in": "Giriş yaptı"
+      },
+      "via": {
+        "web": "Web",
+        "api_key": "API anahtarı",
+        "mcp": "MCP"
+      }
+    }
+  }
+}
