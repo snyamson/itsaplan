@@ -261,7 +261,7 @@ services:
       PGUSER: ${POSTGRES_USER:-itsaplan}
       PGPASSWORD: ${SERVICE_PASSWORD_POSTGRES}
       PGDATABASE: ${POSTGRES_DB:-itsaplan}
-      RESTIC_REPOSITORY: ${RESTIC_REPOSITORY:?set to s3:https://<account>.r2.cloudflarestorage.com/snyamson-desk-backup}
+      RESTIC_REPOSITORY: ${RESTIC_REPOSITORY:?set to s3:https://<account>.r2.cloudflarestorage.com/snyamson-desk-backup/desk}
       RESTIC_PASSWORD: ${RESTIC_PASSWORD:?keep a copy outside this stack}
       AWS_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID:?}
       AWS_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY:?}
