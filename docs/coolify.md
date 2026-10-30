@@ -113,9 +113,44 @@ with a message when `RESTIC_REPOSITORY` still contains a `<placeholder>`.
 After a deploy, `scripts/smoke-test.sh <web-url> <api-url>` requests the sign-in page, the api
 root and the auth endpoint from outside and exits non-zero when one of them does not answer.
 It retries for a few minutes, so it can run right after a redeploy. The **Desk smoke test**
-workflow runs it every 30 minutes and can be called from a deploy workflow. Set the repository
-variables `DESK_WEB_URL` and `DESK_API_URL` to the public URLs; without them the workflow
-is skipped.
+workflow runs it every 30 minutes and after every automatic redeploy (section 8). Set the
+repository variables `DESK_WEB_URL` and `DESK_API_URL` to the public URLs; without them the
+workflow is skipped.
+
+## 8. Automatic upstream releases and redeploys
+
+Three workflows move an upstream release to the running planner without a manual step:
+
+1. **Upstream sync** runs daily at 05:17 UTC and can be started by hand. It opens a pull
+   request, `chore: merge upstream vX.Y.Z`, with the newest stable release of the upstream
+   project. A minor or patch release merges itself once the required checks pass. A major
+   release waits for a review. A conflict outside the tooling files stops the sync and opens an
+   issue that names the files.
+2. **Desk images** starts when the merge lands on `main`. It publishes the four images as
+   `ghcr.io/snyamson/snyamson-desk-{api,web,worker,bot}`, tagged with the commit SHA and
+   `latest`.
+3. When the images are published, the same workflow redeploys the application through the
+   Coolify API, waits for the deployment to end, and runs the smoke test. A failed deployment
+   or a failed smoke test fails the run.
+
+Set up once:
+
+| Where                                              | Name                | Value                                                                                                                                    |
+| -------------------------------------------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| GitHub secret                                      | `UPSTREAM_SYNC_TOKEN` | A fine-grained token of the repository owner for this repository, with read and write on Contents, Pull requests, Workflows and Issues. |
+| GitHub secret                                      | `COOLIFY_TOKEN`     | A Coolify API token with the deploy permission (Keys & Tokens, API tokens). API access must be on under Settings, Advanced.             |
+| GitHub variable                                    | `COOLIFY_URL`       | The address of Coolify, without a trailing slash                                                                                         |
+| GitHub variable                                    | `COOLIFY_APP_UUID`  | The id in the application's address in Coolify (`.../application/<uuid>`)                                                                |
+
+The upstream sync needs its own token because a pull request opened with the workflow token
+starts no checks, and the merge it makes would not start the image build.
+
+Turn **Auto Deploy** off in the application's Advanced settings in Coolify. With it on, Coolify
+deploys on every push to `main`, before the new images exist, and the stack restarts on the
+old ones.
+
+A redeploy fetches the images again because the compose file sets `pull_policy: always`. To
+stay on one build, set `VERSION` in Coolify to a commit SHA tag.
 
 To run the same stack outside Coolify, see [self-hosting.md](self-hosting.md) or
 [railway.md](railway.md).

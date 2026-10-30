@@ -1,9 +1,14 @@
 name: Desk images
 
 # Publishes the four service images of this fork on every push to main, tagged with the
-# commit sha and `latest`. The fork takes its version from upstream, so it cuts no
-# releases of its own: release.yml and cla.yml are disabled in the repository's Actions
-# settings, and this workflow is what publishes.
+# commit sha and `latest`, then redeploys the planner in Coolify and runs the smoke test
+# against it. The fork takes its version from upstream, so it cuts no releases of its
+# own: release.yml and cla.yml are disabled in the repository's Actions settings, and
+# this workflow is what publishes.
+#
+# The redeploy runs once the repository variables COOLIFY_URL and COOLIFY_APP_UUID and
+# the secret COOLIFY_TOKEN are set (docs/coolify.md, "Deploy checks"). Coolify's own
+# auto deploy stays off, so the stack never starts before its images exist.
 on:
   push:
     branches: [main]
@@ -23,3 +28,26 @@ jobs:
     uses: ./.github/workflows/publish-images.yml
     with:
       tag: ${{ github.sha }}
+
+  deploy:
+    name: Redeploy in Coolify
+    needs: publish
+    if: ${{ vars.COOLIFY_URL != '' && vars.COOLIFY_APP_UUID != '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    env:
+      COOLIFY_URL: ${{ vars.COOLIFY_URL }}
+      COOLIFY_APP_UUID: ${{ vars.COOLIFY_APP_UUID }}
+      COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
+    steps:
+      - uses: actions/checkout@v7
+      - run: bash scripts/deploy-coolify.sh
+
+  smoke:
+    name: Smoke test
+    needs: deploy
+    permissions:
+      contents: read
+    uses: ./.github/workflows/desk-smoke.yml
