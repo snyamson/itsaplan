@@ -44,6 +44,7 @@ export default function DocumentEditor({
   projectName,
   document,
   ancestors,
+  documents,
   authorName,
   authorNames,
   canEdit,
@@ -52,8 +53,9 @@ export default function DocumentEditor({
   isProjectOwner,
   canCreate,
   canDelete,
+  defaultCommentsOpen = false,
   onBack,
-  onCreateChild,
+  onCreate,
   onDuplicate,
   onDelete,
   onReload,
@@ -62,6 +64,7 @@ export default function DocumentEditor({
   projectName: string;
   document: ProjectDocument;
   ancestors: ProjectDocumentSummary[];
+  documents: ProjectDocumentSummary[];
   authorName: string | null;
   authorNames: Record<string, string>;
   canEdit: boolean;
@@ -70,8 +73,10 @@ export default function DocumentEditor({
   isProjectOwner: boolean;
   canCreate: boolean;
   canDelete: boolean;
-  onBack: () => void;
-  onCreateChild: () => void;
+  defaultCommentsOpen?: boolean;
+  // Left out where the page around the document has its own way back.
+  onBack?: () => void;
+  onCreate: (parentId: number | null, isPrivate: boolean) => void;
   onDuplicate: (title: string, version: number) => Promise<void>;
   onDelete: (version: number) => Promise<void>;
   onReload: () => Promise<ProjectDocument | null>;
@@ -85,7 +90,7 @@ export default function DocumentEditor({
   const [discardOpen, setDiscardOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [coverOpen, setCoverOpen] = useState(false);
-  const [commentsOpen, setCommentsOpen] = useState(false);
+  const [commentsOpen, setCommentsOpen] = useState(defaultCommentsOpen);
   const [commentSelection, setCommentSelection] = useState<DocumentSelection | null>(null);
   const [inspectorOpen, setInspectorOpen] = useState(false);
   const documentAction = useDocumentActionGate();
@@ -145,6 +150,7 @@ export default function DocumentEditor({
       setInspectorOpen(false);
     },
     editable ? collaboration.version : document.version,
+    collaboration.ready,
   );
   const providerActionPending =
     updateDocument.isPending ||
@@ -230,6 +236,7 @@ export default function DocumentEditor({
           projectName={projectName}
           document={document}
           ancestors={ancestors}
+          documents={documents}
           title={title}
           content={() => editor?.storage.markdown.getMarkdown() ?? content}
           richHtml={() => editor?.getHTML() ?? ''}
@@ -264,7 +271,7 @@ export default function DocumentEditor({
           onCoverPick={() => setCoverOpen(true)}
           onCoverRemove={() => changeCover(null)}
           onStickyToolbarChange={setStickyToolbar}
-          onCreateChild={onCreateChild}
+          onCreate={onCreate}
           onDuplicate={() => {
             void documentAction.run(async () => {
               const baseVersion = await prepareVersion();
@@ -298,7 +305,7 @@ export default function DocumentEditor({
             void runVersioned((baseVersion) =>
               archiveDocument.mutateAsync({ documentId: document.id, version: baseVersion }),
             ).then((changed) => {
-              if (changed) onBack();
+              if (changed) onBack?.();
             });
           }}
           onRestore={() => {

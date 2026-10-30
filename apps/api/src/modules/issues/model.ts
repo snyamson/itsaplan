@@ -335,6 +335,17 @@ export const IssueSearchHitResponse = t.Object({
   completedAt: t.Nullable(t.String()),
 });
 
+export const CrossProjectIssueHitResponse = t.Composite([
+  IssueSearchHitResponse,
+  t.Object({
+    projectId: t.Number(),
+    projectRef: t.String(),
+    projectKey: t.String(),
+    projectName: t.String(),
+    teamName: t.String(),
+  }),
+]);
+
 // FeedItemRow from activity.ts: one timeline entry (comment or change-log).
 // kind is the FeedKind union (a string).
 export const FeedItemResponse = t.Object({
@@ -532,6 +543,19 @@ export const searchIssuesQuery = t.Object({
   limit: t.Optional(t.Numeric({ description: 'Max results (1-500). Default 50.' })),
 });
 
+export const searchAllIssuesQuery = t.Object({
+  q: t.String({
+    minLength: 1,
+    description:
+      'Case-insensitive substring, matched against the title, description, issue number ("KEY-42" or a bare number), and custom field text.',
+  }),
+  limit: t.Optional(t.Numeric({ description: 'Max results (1-50). Default 20.' })),
+  perProjectLimit: t.Optional(
+    t.Numeric({ description: 'Max results from one project (1-50). Default 5.' }),
+  ),
+  excludeProjectId: t.Optional(t.Numeric({ description: "Leave out this project's issues." })),
+});
+
 export const listIssuesQuery = t.Object({
   columnId: t.Optional(t.Numeric({ description: 'Exact column (state) id.' })),
   typeId: t.Optional(t.Numeric({ description: 'Exact issue type id.' })),
@@ -651,6 +675,10 @@ export const issueLinkParams = t.Object({ issueId: t.Numeric(), linkId: t.Numeri
 export const checklistTitleBody = t.Object({ title: ChecklistTitleSchema });
 
 export const createChecklistItemBody = t.Object({ content: ChecklistItemContentSchema });
+
+export const createChecklistItemsBody = t.Object({
+  items: t.Array(createChecklistItemBody, { minItems: 1, maxItems: 100 }),
+});
 
 export const updateChecklistItemBody = t.Object({
   content: t.Optional(ChecklistItemContentSchema),

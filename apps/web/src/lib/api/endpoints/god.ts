@@ -25,6 +25,7 @@ export interface InstanceAuthSettings {
   personalWorkspaces: boolean;
   // Days an invite link stays valid; 0 means invites never expire.
   inviteTtlDays: number;
+  inviteSearch: boolean;
   // The domains a new account's address must be at; empty admits any address.
   allowedEmailDomains: string[];
   hasEmailProvider: boolean;
@@ -41,6 +42,7 @@ export interface InstanceAuthSettingsPatch {
   trustProviderEmails?: boolean;
   personalWorkspaces?: boolean;
   inviteTtlDays?: number;
+  inviteSearch?: boolean;
   allowedEmailDomains?: string[];
 }
 
@@ -296,6 +298,19 @@ export const updateInstanceAgentSettings = (body: Partial<AgentSettings>) =>
   request<AgentSettings>('/god/agent-settings', {
     method: 'PUT',
     body: JSON.stringify(body),
+  });
+
+// The sites that may show the shared work items and views, and the public pages, in a frame.
+export interface EmbedSites {
+  origins: string[];
+}
+
+export const getInstanceEmbedSites = () => request<EmbedSites>('/god/embed-sites');
+
+export const updateInstanceEmbedSites = (origins: string[]) =>
+  request<EmbedSites>('/god/embed-sites', {
+    method: 'PUT',
+    body: JSON.stringify({ origins }),
   });
 
 export const getInstanceStorageSettings = () => request<StorageSettings>('/god/storage-settings');

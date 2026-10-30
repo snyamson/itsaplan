@@ -15,6 +15,7 @@ import {
   customFieldOption,
   initiative,
   cycle,
+  team,
 } from '@repo/db';
 import {
   and,
@@ -36,6 +37,7 @@ import {
 import type { IssueQuery } from '#modules/agents/core/issue-query';
 import { iso, num, numOrNull, HttpError } from '#shared/lib';
 import type { ProjectRow } from '#modules/projects/service';
+import { projectRefSql } from '#modules/teams/ref';
 import { assertProjectFeature } from '#shared/access';
 import {
   getCustomFieldById,
@@ -71,6 +73,7 @@ import { getInitiativeProjectId } from '#modules/initiatives/service';
 import { cycleStatus, getCycleRef, type CycleStatus } from '#modules/cycles/service';
 import { getMembership } from '#modules/members/service';
 import { enqueueAgentRun } from '#modules/agents/core/run-queue';
+import { deleteThreadsWhere } from '#modules/agents/core/runtime/memory';
 import { queueStatusRuns } from '#modules/agents/schedules/issue-runs';
 import { applySubtaskAutomation } from './automation';
 import { assertWipLimit, columnAutoAssignee, wipLimitBreach } from '#modules/columns/service';
@@ -298,13 +301,90 @@ function escapeLike(value: string): string {
   return value.replace(/[\\%_]/g, (c) => `\\${c}`);
 }
 
+// The issue number in a text query: a bare number, or "KEY-42".
+function parseIssueNumber(raw: string): { key: string | null; seq: number } | null {
+  if (/^\d+$/.test(raw)) return { key: null, seq: Number(raw) };
+  const m = raw.match(/^([A-Za-z][A-Za-z0-9]*)-(\d+)$/);
+  return m ? { key: m[1], seq: Number(m[2]) } : null;
+}
+
+// Text search: raw matches, case-insensitively, the title, description, scalar custom
+// field text values and select/multi_select option labels, or numberMatch.
+function textMatch(raw: string, numberMatch: SQL | undefined): SQL {
+  const pattern = `%${escapeLike(raw)}%`;
+  return or(
+    ilike(issue.title, pattern),
+    ilike(issue.description, pattern),
+    exists(
+      db
+        .select({ one: sql`1` })
+        .from(issueFieldValue)
+        .where(
+          and(eq(issueFieldValue.issueId, issue.id), ilike(issueFieldValue.valueText, pattern)),
+        ),
+    ),
+    exists(
+      db
+        .select({ one: sql`1` })
+        .from(issueFieldOption)
+        .innerJoin(customFieldOption, eq(customFieldOption.id, issueFieldOption.optionId))
+        .where(
+          and(eq(issueFieldOption.issueId, issue.id), ilike(customFieldOption.value, pattern)),
+        ),
+    ),
+    numberMatch,
+  )!;
+}
+
+function hitOrder(numberMatch: SQL | undefined): SQL[] {
+  const recent = sql`${issue.updatedAt} desc`;
+  return numberMatch ? [sql`case when ${numberMatch} then 0 else 1 end`, recent] : [recent];
+}
+
+const hitColumns = {
+  id: issue.id,
+  sequenceNumber: issue.sequenceNumber,
+  typeId: issue.typeId,
+  initiativeId: issue.initiativeId,
+  cycleId: issue.cycleId,
+  parentId: issue.parentId,
+  assigneeUserId: issue.assigneeUserId,
+  delegateUserId: issue.delegateUserId,
+  columnId: issue.columnId,
+  title: issue.title,
+  priority: issue.priority,
+  dueDate: issue.dueDate,
+  archivedAt: issue.archivedAt,
+  createdAt: issue.createdAt,
+  updatedAt: issue.updatedAt,
+  completedAt,
+};
+
+type HitRow = Omit<
+  IssueSearchHit,
+  'identifier' | 'labelIds' | 'archived' | 'createdAt' | 'updatedAt' | 'completedAt'
+> & { archivedAt: Date | null; createdAt: Date; updatedAt: Date; completedAt: Date | null };
+
+function toHit(
+  { archivedAt, createdAt, updatedAt, completedAt, ...r }: HitRow,
+  projectKey: string,
+): IssueSearchHit {
+  return {
+    ...r,
+    identifier: `${projectKey}-${r.sequenceNumber}`,
+    labelIds: [],
+    archived: archivedAt !== null,
+    createdAt: iso(createdAt),
+    updatedAt: iso(updatedAt),
+    completedAt: completedAt ? iso(completedAt) : null,
+  };
+}
+
 // Server-side issue read backing two routes: text search (search_issues) and the
-// filtered list (list_issues). Text search (filters.query) matches, case-
-// insensitively, the title, description, the issue number (a bare number, or
-// "KEY-42" for this project), scalar custom field text values, and
-// select/multi_select option labels. The other fields apply as exact filters (used
-// by list_issues). includeArchived adds archived issues to the result (search always
-// sets it; list defaults to active only).
+// filtered list (list_issues). Text search (filters.query) is textMatch, and also
+// matches the issue number: a bare number, or "KEY-42" for this project. The other
+// fields apply as exact filters (used by list_issues). includeArchived adds archived
+// issues to the result (search always sets it; list defaults to active only).
 export async function searchIssues(
   project: ProjectRow,
   filters: IssueQuery & {
@@ -319,40 +399,12 @@ export async function searchIssues(
   if (!opts.includeArchived) conds.push(isNull(issue.archivedAt));
 
   const raw = filters.query?.trim();
-  let seqMatch: number | null = null;
+  let numberMatch: SQL | undefined;
   if (raw) {
-    const pattern = `%${escapeLike(raw)}%`;
-    // Recognise the issue number: a bare number, or "KEY-42" whose key matches this
-    // project. Matched against sequence_number (the identifier is not a column).
-    if (/^\d+$/.test(raw)) {
-      seqMatch = Number(raw);
-    } else {
-      const m = raw.match(/^([A-Za-z][A-Za-z0-9]*)-(\d+)$/);
-      if (m && m[1].toLowerCase() === project.key.toLowerCase()) seqMatch = Number(m[2]);
-    }
-    const textConds: SQL[] = [
-      ilike(issue.title, pattern),
-      ilike(issue.description, pattern),
-      exists(
-        db
-          .select({ one: sql`1` })
-          .from(issueFieldValue)
-          .where(
-            and(eq(issueFieldValue.issueId, issue.id), ilike(issueFieldValue.valueText, pattern)),
-          ),
-      ),
-      exists(
-        db
-          .select({ one: sql`1` })
-          .from(issueFieldOption)
-          .innerJoin(customFieldOption, eq(customFieldOption.id, issueFieldOption.optionId))
-          .where(
-            and(eq(issueFieldOption.issueId, issue.id), ilike(customFieldOption.value, pattern)),
-          ),
-      ),
-    ];
-    if (seqMatch !== null) textConds.push(eq(issue.sequenceNumber, seqMatch));
-    conds.push(or(...textConds)!);
+    const number = parseIssueNumber(raw);
+    if (number && (number.key === null || number.key.toLowerCase() === project.key.toLowerCase()))
+      numberMatch = eq(issue.sequenceNumber, number.seq);
+    conds.push(textMatch(raw, numberMatch));
   }
 
   // Exact filters, mirroring matchesIssue: undefined skips the filter, null matches
@@ -409,58 +461,82 @@ export async function searchIssues(
   if (filters.updatedFrom) conds.push(gte(issue.updatedAt, filters.updatedFrom));
   if (filters.updatedTo) conds.push(lt(issue.updatedAt, filters.updatedTo));
 
-  // Exact number match first (if any), then most recently updated.
-  const orderBy =
-    seqMatch !== null
-      ? [
-          sql`case when ${issue.sequenceNumber} = ${seqMatch} then 0 else 1 end`,
-          sql`${issue.updatedAt} desc`,
-        ]
-      : [sql`${issue.updatedAt} desc`];
-
   const base = db
-    .select({
-      id: issue.id,
-      sequenceNumber: issue.sequenceNumber,
-      typeId: issue.typeId,
-      initiativeId: issue.initiativeId,
-      cycleId: issue.cycleId,
-      parentId: issue.parentId,
-      assigneeUserId: issue.assigneeUserId,
-      delegateUserId: issue.delegateUserId,
-      columnId: issue.columnId,
-      title: issue.title,
-      priority: issue.priority,
-      dueDate: issue.dueDate,
-      archivedAt: issue.archivedAt,
-      createdAt: issue.createdAt,
-      updatedAt: issue.updatedAt,
-      completedAt,
-    })
+    .select(hitColumns)
     .from(issue)
     .where(and(...conds))
-    .orderBy(...orderBy);
+    .orderBy(...hitOrder(numberMatch));
   const rows = filters.limit !== undefined ? await base.limit(filters.limit) : await base;
 
-  const hits: IssueSearchHit[] = rows.map((r) => ({
-    id: r.id,
-    sequenceNumber: r.sequenceNumber,
-    identifier: `${project.key}-${r.sequenceNumber}`,
-    title: r.title,
-    columnId: r.columnId,
-    typeId: r.typeId,
-    initiativeId: r.initiativeId,
-    cycleId: r.cycleId,
-    parentId: r.parentId,
-    assigneeUserId: r.assigneeUserId,
-    delegateUserId: r.delegateUserId,
-    priority: r.priority,
-    dueDate: r.dueDate,
-    labelIds: [],
-    archived: r.archivedAt !== null,
-    createdAt: iso(r.createdAt),
-    updatedAt: iso(r.updatedAt),
-    completedAt: r.completedAt ? iso(r.completedAt) : null,
+  const hits = rows.map((r) => toHit(r, project.key));
+  await attachLabels(hits);
+  return hits;
+}
+
+export interface CrossProjectIssueHit extends IssueSearchHit {
+  projectId: number;
+  projectRef: string;
+  projectKey: string;
+  projectName: string;
+  teamName: string;
+}
+
+// Text search across the given projects, archived issues included, at most
+// perProjectLimit hits from each project. "KEY-42" matches issue 42 of every listed
+// project whose key is KEY, since a key is unique only within its team.
+export async function searchIssuesInProjects(
+  projectIds: number[],
+  query: string,
+  { limit, perProjectLimit }: { limit: number; perProjectLimit: number },
+): Promise<CrossProjectIssueHit[]> {
+  const raw = query.trim();
+  if (!projectIds.length || !raw) return [];
+  const number = parseIssueNumber(raw);
+  const numberMatch = number
+    ? and(
+        eq(issue.sequenceNumber, number.seq),
+        number.key === null
+          ? undefined
+          : sql`lower(${projectTable.key}) = ${number.key.toLowerCase()}`,
+      )
+    : undefined;
+  const order = hitOrder(numberMatch);
+  // Only the id and the rank: the window sees every match, the hit columns are read
+  // for the rows that pass the cap.
+  const ranked = db
+    .select({
+      id: issue.id,
+      rank: sql<number>`row_number() over (partition by ${issue.projectId} order by ${sql.join(order, sql`, `)})`.as(
+        'rank',
+      ),
+    })
+    .from(issue)
+    .innerJoin(projectTable, eq(projectTable.id, issue.projectId))
+    .where(and(inArray(issue.projectId, projectIds), textMatch(raw, numberMatch)))
+    .as('ranked');
+  const rows = await db
+    .select({
+      ...hitColumns,
+      projectId: projectTable.id,
+      projectRef: projectRefSql,
+      projectKey: projectTable.key,
+      projectName: projectTable.name,
+      teamName: team.name,
+    })
+    .from(issue)
+    .innerJoin(ranked, eq(ranked.id, issue.id))
+    .innerJoin(projectTable, eq(projectTable.id, issue.projectId))
+    .innerJoin(team, eq(team.id, projectTable.teamId))
+    .where(lte(ranked.rank, perProjectLimit))
+    .orderBy(...order)
+    .limit(limit);
+  const hits = rows.map(({ projectId, projectRef, projectKey, projectName, teamName, ...r }) => ({
+    ...toHit(r, projectKey),
+    projectId,
+    projectRef,
+    projectKey,
+    projectName,
+    teamName,
   }));
   await attachLabels(hits);
   return hits;
@@ -1167,9 +1243,11 @@ async function enqueueDelegateRun(after: IssueRow, actor?: ActivityActor): Promi
 }
 
 // Deletes an issue and everything attached to it. Field options/values, labels,
-// attachments, and activity all go by their ON DELETE CASCADE on issue_id. Returns
-// the deleted attachment rows so the caller can remove their objects from the store.
-// Returns null if the issue did not exist.
+// attachments, and activity all go by their ON DELETE CASCADE on issue_id; the agents'
+// conversation threads about it live outside the cascades and are deleted after. Unlike
+// archiving, this cannot be undone, so nothing would ever read those threads again.
+// Returns the deleted attachment rows so the caller can remove their objects from the
+// store. Returns null if the issue did not exist.
 export async function deleteIssue(
   issueId: number,
   actorUserId?: string | null,
@@ -1186,6 +1264,7 @@ export async function deleteIssue(
     return removed.length ? attachmentRows.map(mapAttachment) : null;
   });
   if (!attachments) return null;
+  await deleteThreadsWhere({ issueId });
   await emitIssueEvent('issue.deleted', deleted, actorUserId);
   return attachments;
 }

@@ -9,8 +9,10 @@ import {
   assertProjectOwner,
   assertProjectWritable,
   assertWritable,
+  readableProjectIds,
   requireUser,
 } from '#shared/access';
+import { boundProjectId, isMcpRequest } from '#shared/mcp-request';
 import { getProjectById } from '#modules/projects/service';
 import { HttpError, instantParam } from '#shared/lib';
 import { accessErrors, commonErrors, errors } from '#shared/responses';
@@ -18,6 +20,7 @@ import { deleteObject } from '@repo/storage';
 import {
   createIssue,
   searchIssues,
+  searchIssuesInProjects,
   listIssues,
   listArchivedIssues,
   getIssue,
@@ -81,6 +84,7 @@ import { DevelopmentLinkResponse } from '#modules/git/model';
 import {
   createChecklist,
   createChecklistItem,
+  createChecklistItems,
   deleteChecklist,
   deleteChecklistItem,
   getChecklistIssueId,
@@ -122,6 +126,7 @@ import {
   updateWorklogBody,
   IssueWithFieldsResponse,
   IssueSearchHitResponse,
+  CrossProjectIssueHitResponse,
   FeedItemResponse,
   FeedPageResponse,
   GroupedFeedPageResponse,
@@ -136,6 +141,7 @@ import {
   bulkArchiveIssuesBody,
   bulkDeleteIssuesBody,
   searchIssuesQuery,
+  searchAllIssuesQuery,
   listIssuesQuery,
   issueSequenceParams,
   updateIssueBody,
@@ -146,6 +152,7 @@ import {
   issueLinkParams,
   checklistTitleBody,
   createChecklistItemBody,
+  createChecklistItemsBody,
   updateChecklistItemBody,
   feedRangeQuery,
   createCommentBody,
@@ -561,6 +568,39 @@ export const issueRoutes = new Elysia({ name: 'issues', detail: { tags: ['Issues
         description:
           'Get an issue by its project-scoped number: the 42 in "MKT-42". Use this when you were given an identifier; get_issue takes the internal numeric id instead.',
         ...mcpTool('get_issue_by_number'),
+      },
+    },
+  )
+
+  // Text search across every project the caller may read work items in, matched like
+  // search_issues. This route comes before /issues/:issueId so the static "search"
+  // segment wins over the numeric param.
+  .get(
+    '/issues/search',
+    async ({ user, query, request }) => {
+      const ids = await readableProjectIds(requireUser(user).id, [['work_items', 'read']], {
+        mcpOnly: isMcpRequest(request.headers),
+      });
+      const bound = boundProjectId(request.headers);
+      const clamp = (value: number) => Math.min(Math.max(value, 1), 50);
+      return searchIssuesInProjects(
+        ids.filter((id) => (bound == null || id === bound) && id !== query.excludeProjectId),
+        query.q,
+        { limit: clamp(query.limit ?? 20), perProjectLimit: clamp(query.perProjectLimit ?? 5) },
+      );
+    },
+    {
+      query: searchAllIssuesQuery,
+      response: { 200: t.Array(CrossProjectIssueHitResponse), ...errors(400, 401) },
+      detail: {
+        summary: 'Search issues in all projects',
+        description:
+          'Search the issues of every project you can read by text, archived issues included, ' +
+          'at most perProjectLimit hits from each project. Each hit names its project ' +
+          '(projectKey, projectRef, projectName, teamName); use search_issues for one project. ' +
+          'An agent run searches only the project it works in.',
+        ...requiresPermission(['work_items', 'read']),
+        ...mcpTool('search_issues_all_projects'),
       },
     },
   )
@@ -1073,6 +1113,26 @@ export const issueRoutes = new Elysia({ name: 'issues', detail: { tags: ['Issues
         summary: 'Add a checklist item',
         description: 'Append an item to a checklist.',
         ...mcpTool('create_checklist_item'),
+      },
+    },
+  )
+
+  .post(
+    '/checklists/:checklistId/items/batch',
+    async ({ params, body, user, set }) => {
+      set.status = 201;
+      return createChecklistItems(params.checklistId, body.items, requireUser(user).id);
+    },
+    {
+      body: createChecklistItemsBody,
+      params: checklistParams,
+      checklist: 'edit',
+      response: { 201: t.Array(ChecklistItemResponse), ...commonErrors },
+      detail: {
+        summary: 'Add checklist items in bulk',
+        description:
+          'Append 1–100 items to an existing checklist in input order. Each content is 1–500 characters. The items and their activity entries are saved atomically.',
+        ...mcpTool('create_checklist_items'),
       },
     },
   )

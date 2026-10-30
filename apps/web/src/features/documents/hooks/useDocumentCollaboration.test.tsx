@@ -16,6 +16,7 @@ const replacedGlobals = [
   'document',
   'navigator',
   'Node',
+  'NodeFilter',
   'HTMLElement',
   'requestAnimationFrame',
   'IS_REACT_ACT_ENVIRONMENT',
@@ -88,6 +89,7 @@ beforeEach(async () => {
     document: { configurable: true, value: dom.window.document },
     navigator: { configurable: true, value: dom.window.navigator },
     Node: { configurable: true, value: dom.window.Node },
+    NodeFilter: { configurable: true, value: dom.window.NodeFilter },
     HTMLElement: { configurable: true, value: dom.window.HTMLElement },
     requestAnimationFrame: {
       configurable: true,
@@ -175,5 +177,55 @@ describe('useDocumentCollaboration', () => {
 
     assert.equal(collaboration.ready, false);
     assert.equal(collaboration.openFailed, true);
+  });
+
+  it('offers the stored changes for export when one of them no longer applies', async () => {
+    window.sessionStorage.setItem(
+      'document-steps:user-1:SEKTA:42',
+      JSON.stringify({
+        epoch: 'e1',
+        version: 0,
+        clientId: 'client-1',
+        base: {
+          type: 'doc',
+          content: [
+            {
+              type: 'paragraph',
+              attrs: { blockId: 'saved' },
+              content: [{ type: 'text', text: 'Saved' }],
+            },
+          ],
+        },
+        steps: [
+          {
+            stepType: 'replace',
+            from: 6,
+            to: 6,
+            slice: { content: [{ type: 'text', text: '!' }] },
+          },
+          {
+            stepType: 'replaceAround',
+            from: 20,
+            to: 22,
+            gapFrom: 21,
+            gapTo: 21,
+            insert: 1,
+            slice: { content: [{ type: 'paragraph' }] },
+            structure: true,
+          },
+        ],
+      }),
+    );
+    await act(async () => {
+      root.render(
+        <QueryClientProvider client={queryClient}>
+          <Probe document={projectDocument(2, 'Saved')} />
+        </QueryClientProvider>,
+      );
+    });
+
+    assert.equal(collaboration.recoveryConflict, true);
+    assert.equal(collaboration.status, 'conflict');
+    assert.equal(editor.getText(), 'Saved!');
   });
 });

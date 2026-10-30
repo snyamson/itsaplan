@@ -705,6 +705,15 @@ export const agentRun = pgTable(
     sourceActivityId: integer('source_activity_id').references(() => issueActivity.id, {
       onDelete: 'set null',
     }),
+    // A mention in a document comment: the document and the comment. Such a run has no
+    // issue.
+    documentId: integer('document_id').references(() => projectDocument.id, {
+      onDelete: 'cascade',
+    }),
+    sourceDocumentCommentId: uuid('source_document_comment_id').references(
+      () => documentComment.id,
+      { onDelete: 'set null' },
+    ),
     // The mention comment body at enqueue time, framed into the agent's prompt.
     prompt: text('prompt').notNull(),
     // pending -> success | failed | canceled. Like webhook_delivery, a claim keeps the row
@@ -1150,8 +1159,9 @@ export const agentSkillLink = pgTable(
 // catalog (tool_key) bound to one integration_credential. The tool's integration owns
 // the secret, so the tool holds no secret of its own — it references the credential
 // the runtime decrypts at call time. Different tools of the same integration may be
-// bound to different credentials (e.g. two Jina keys). Enabled on an agent via
-// agent_tool_link.
+// bound to different credentials (e.g. two Jina keys). A tool of an integration with
+// no credential (PDF) has a null credential_id and is configured once per team.
+// Enabled on an agent via agent_tool_link.
 export const agentTool = pgTable(
   'agent_tool',
   {
@@ -1160,13 +1170,16 @@ export const agentTool = pgTable(
       .notNull()
       .references(() => team.id, { onDelete: 'cascade' }),
     toolKey: text('tool_key').notNull(),
-    credentialId: integer('credential_id')
-      .notNull()
-      .references(() => integrationCredential.id, { onDelete: 'cascade' }),
+    credentialId: integer('credential_id').references(() => integrationCredential.id, {
+      onDelete: 'cascade',
+    }),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [
     unique().on(t.teamId, t.toolKey, t.credentialId),
+    uniqueIndex('agent_tool_team_tool_keyless_uq')
+      .on(t.teamId, t.toolKey)
+      .where(sql`${t.credentialId} IS NULL`),
     index('agent_tool_team_idx').on(t.teamId),
     index('agent_tool_credential_idx').on(t.credentialId),
   ],
@@ -2313,8 +2326,8 @@ export const webhookDelivery = pgTable(
 // worker claims due rows the same way as webhook_delivery, and cursor is the
 // job's own per-phase resumability checkpoint, not the source API's pagination
 // cursor. The credential columns are cleared once the job reaches a terminal
-// status. One source adapter per value (apps/worker/src/import-sources.ts).
-export type ImportSource = 'plane' | 'linear';
+// status. `source` names a source adapter of the worker (apps/worker/src/import-sources.ts);
+// the database takes any name, so a build can add sources of its own.
 
 export const importJob = pgTable(
   'import_job',
@@ -2341,7 +2354,6 @@ export const importJob = pgTable(
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [
-    check('import_job_source_check', sql`${t.source} IN ('plane', 'linear')`),
     check(
       'import_job_phase_check',
       sql`${t.phase} IN ('discover', 'create', 'link', 'rewrite', 'attachments', 'done')`,
@@ -2383,11 +2395,11 @@ export const importRecord = pgTable(
   (t) => [
     check(
       'import_record_source_entity_type_check',
-      sql`${t.sourceEntityType} IN ('issue', 'comment', 'label', 'state', 'cycle', 'attachment')`,
+      sql`${t.sourceEntityType} IN ('issue', 'comment', 'label', 'state', 'cycle', 'attachment', 'checklist', 'custom_field')`,
     ),
     check(
       'import_record_local_entity_type_check',
-      sql`${t.localEntityType} IS NULL OR ${t.localEntityType} IN ('issue', 'comment', 'label', 'state', 'cycle', 'attachment')`,
+      sql`${t.localEntityType} IS NULL OR ${t.localEntityType} IN ('issue', 'comment', 'label', 'state', 'cycle', 'attachment', 'checklist', 'custom_field')`,
     ),
     uniqueIndex('import_record_job_source_uq').on(t.importJobId, t.sourceEntityType, t.sourceId),
     index('import_record_job_local_idx').on(t.importJobId, t.localEntityType, t.localId),
@@ -2398,10 +2410,12 @@ export const importRecord = pgTable(
 
 // Per-user inbox notifications. One row per (recipient, event): a user is notified
 // about an issue they are involved in (assigned to them, mentioned, or watching it
-// when it is commented on or moved). The actor's own actions never notify the actor.
-// project_id is denormalized from the issue so the inbox can filter and scope by
-// project. source_activity_id points at the issue_activity row that produced the
-// notification (set null if that entry is later removed). type selects the kind.
+// when it is commented on or moved), or about a document that mentions them in its
+// text or in a comment. A row points at either an issue or a document. The actor's own
+// actions never notify the actor. project_id is denormalized from the issue or the
+// document so the inbox can filter and scope by project. source_activity_id points at
+// the issue_activity row that produced the notification, document_comment_id at the
+// document comment (each set null if that entry is later removed). type selects the kind.
 // read_at NULL means unread; snoozed_until, when set and still in the future, hides
 // the row from the default inbox until then.
 export const notification = pgTable(
@@ -2414,10 +2428,14 @@ export const notification = pgTable(
     projectId: integer('project_id')
       .notNull()
       .references(() => project.id, { onDelete: 'cascade' }),
-    issueId: integer('issue_id')
-      .notNull()
-      .references(() => issue.id, { onDelete: 'cascade' }),
+    issueId: integer('issue_id').references(() => issue.id, { onDelete: 'cascade' }),
     sourceActivityId: integer('source_activity_id').references(() => issueActivity.id, {
+      onDelete: 'set null',
+    }),
+    documentId: integer('document_id').references(() => projectDocument.id, {
+      onDelete: 'cascade',
+    }),
+    documentCommentId: uuid('document_comment_id').references(() => documentComment.id, {
       onDelete: 'set null',
     }),
     type: text('type').notNull(),
@@ -2434,6 +2452,7 @@ export const notification = pgTable(
       'notification_type_check',
       sql`${t.type} IN ('assigned', 'mentioned', 'commented', 'state_changed')`,
     ),
+    check('notification_target_check', sql`(${t.issueId} IS NULL) <> (${t.documentId} IS NULL)`),
     // Backs the inbox list: a user's notifications newest first.
     index('notification_user_idx').on(t.userId, t.createdAt.desc(), t.id.desc()),
     // Backs the unread count and the unread-only inbox view.

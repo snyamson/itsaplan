@@ -8,6 +8,8 @@ export const StorageSettingsSchema = t.Object({
   projectQuotaMb: t.Number(),
 });
 
+export const InviteSearchSchema = t.Object({ enabled: t.Boolean() });
+
 export const ProjectDefaultsSchema = t.Object({
   mcpEnabled: t.Boolean(),
 });
@@ -34,6 +36,14 @@ export const HotkeyCombosSchema = t.Record(
   t.String({ pattern: '^[a-z][a-z0-9.-]{0,63}$' }),
   t.String({ pattern: '^(mod\\+|shift\\+|alt\\+)*[a-z0-9]{1,10}$' }),
 );
+
+export const EmbedSitesSchema = t.Object({
+  origins: t.Array(t.String({ maxLength: 300 }), {
+    maxItems: 50,
+    description:
+      'Sites that may show the public pages in a frame, as origins such as https://example.com.',
+  }),
+});
 
 const ReleaseSchema = t.Object({
   tag: t.String(),

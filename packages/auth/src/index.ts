@@ -598,6 +598,7 @@ function createAuth() {
       // the old one ends with it. The signed-in change-password form sends
       // revokeOtherSessions for the same reason.
       revokeSessionsOnPasswordReset: true,
+      password: extensions.password,
       sendResetPassword: async ({ user, url }) => {
         await sendAuthEmail({
           to: user.email,

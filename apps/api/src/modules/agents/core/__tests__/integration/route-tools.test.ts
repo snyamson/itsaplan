@@ -80,6 +80,44 @@ describe('internal agent route tools', () => {
     // ...and an action that was not granted is absent.
     expect(tools.delete_issue).toBeUndefined();
     expect(tools.update_issue).toBeUndefined();
+    expect(tools.create_checklist_items).toBeUndefined();
+  });
+
+  it('opens an attachment: a text file as its text, an image as an image part', async () => {
+    const { asOwner } = await setup();
+    const view = await asOwner.projects({ projectKey: 'MKT' }).get();
+    const issue = await asOwner
+      .projects({ projectKey: 'MKT' })
+      .issues.post({ columnId: view.data!.columns[0]!.id, title: 'Task' });
+    const issueId = issue.data!.id;
+    const png = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+    const image = await asOwner.issues({ issueId }).attachments.post({
+      file: new File([png], 'shot.png', { type: 'image/png' }),
+    });
+    const note = await asOwner.issues({ issueId }).attachments.post({
+      file: new File(['hello'], 'note.txt', { type: 'text/plain' }),
+    });
+    const tools = await toolsFor(asOwner, []);
+
+    expect(await run(tools, 'view_attachment', { attachment: note.data!.id })).toMatchObject({
+      images: [],
+      others: [{ id: note.data!.id, text: 'hello' }],
+    });
+
+    const viewed = await run(tools, 'view_attachment', { attachment: image.data!.id });
+    expect(await tools.view_attachment!.toModelOutput!(viewed)).toEqual({
+      type: 'content',
+      value: [
+        {
+          type: 'text',
+          text: JSON.stringify({
+            images: [{ id: image.data!.id, filename: 'shot.png', contentType: 'image/png' }],
+            others: [],
+          }),
+        },
+        { type: 'image-data', data: Buffer.from(png).toString('base64'), mediaType: 'image/png' },
+      ],
+    });
   });
 
   it('previews project activity only for the internal agent and retains full history', async () => {
@@ -252,12 +290,14 @@ describe('internal agent route tools', () => {
     expect(catalog.get('get_issue')).toEqual(['work_items', 'read']);
 
     // Everything else has one. prepare_issue_import and get_current_date have no
-    // route; charts and the project itself are open to any member of the project.
+    // route; charts and the project itself are open to any member of the project;
+    // view_attachment reads work_items or initiatives, by whose attachment it opens.
     expect([...catalog].filter(([, permission]) => !permission).map(([key]) => key)).toEqual([
       'prepare_issue_import',
       'create_chart',
       'get_current_date',
       'get_project',
+      'view_attachment',
     ]);
   });
 
@@ -301,6 +341,50 @@ describe('internal agent route tools', () => {
     expect(listed.data?.filter((a) => a.id === agentId)).toHaveLength(1);
     const tools = buildRouteTools(project, first, agent.tools);
     expect(await run(tools, 'get_project')).toMatchObject({ columns: expect.any(Array) });
+  });
+
+  it('appends a checklist batch through the granted route tool', async () => {
+    const { asOwner } = await setup();
+    const view = await asOwner.projects({ projectKey: 'MKT' }).get();
+    const issue = await asOwner.projects({ projectKey: 'MKT' }).issues.post({
+      columnId: view.data!.columns[0].id,
+      title: 'Release',
+    });
+    const checklist = await asOwner
+      .issues({ issueId: issue.data!.id })
+      .checklists.post({ title: 'Steps' });
+    const tools = await toolsFor(asOwner, ['create_checklist_items']);
+    const items = [{ content: 'Tag release' }, { content: 'Publish notes' }];
+    expect(
+      await run(tools, 'create_checklist_items', { checklistId: checklist.data!.id, items }),
+    ).toMatchObject(items);
+    const read = await asOwner.issues({ issueId: issue.data!.id }).get();
+    expect(read.data!.checklists[0].items).toMatchObject(items);
+  });
+
+  it('denies a checklist batch when the agent role cannot edit work items', async () => {
+    const { asOwner } = await setup();
+    const view = await asOwner.projects({ projectKey: 'MKT' }).get();
+    const issue = await asOwner.projects({ projectKey: 'MKT' }).issues.post({
+      columnId: view.data!.columns[0].id,
+      title: 'Release',
+    });
+    const checklist = await asOwner
+      .issues({ issueId: issue.data!.id })
+      .checklists.post({ title: 'Steps' });
+    const role = await createRole(asOwner, 'MKT', {
+      name: 'Read only',
+      permissions: { work_items: { read: true, edit: false } },
+    });
+    const tools = await toolsFor(asOwner, ['create_checklist_items'], role.data!.id);
+    expect(
+      await run(tools, 'create_checklist_items', {
+        checklistId: checklist.data!.id,
+        items: [{ content: 'Forbidden' }],
+      }),
+    ).toMatchObject({ error: expect.anything() });
+    const read = await asOwner.issues({ issueId: issue.data!.id }).get();
+    expect(read.data!.checklists[0].items).toEqual([]);
   });
 
   it("enforces the agent's role: a forbidden action returns the route's error", async () => {
@@ -406,7 +490,10 @@ describe('internal agent route tools are bound to the run project', () => {
   });
 
   it('refuses a checklist of an issue of another project', async () => {
-    const { asOwner, tools, opsIssue } = await crossProject(['create_checklist_item']);
+    const { asOwner, tools, opsIssue } = await crossProject([
+      'create_checklist_item',
+      'create_checklist_items',
+    ]);
     const checklist = await asOwner
       .issues({ issueId: opsIssue })
       .checklists.post({ title: 'Steps' });
@@ -414,6 +501,14 @@ describe('internal agent route tools are bound to the run project', () => {
     expect(
       await run(tools, 'create_checklist_item', { checklistId: checklist.data!.id, content: 'x' }),
     ).toEqual(outside);
+    expect(
+      await run(tools, 'create_checklist_items', {
+        checklistId: checklist.data!.id,
+        items: [{ content: 'Forbidden' }],
+      }),
+    ).toEqual(outside);
+    const read = await asOwner.issues({ issueId: opsIssue }).get();
+    expect(read.data!.checklists[0].items).toEqual([]);
   });
 
   it('refuses a cycle and an initiative of another project', async () => {

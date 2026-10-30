@@ -97,6 +97,14 @@ export interface IssueSearchHit {
   archived: boolean;
 }
 
+export interface CrossProjectIssueHit extends IssueSearchHit {
+  projectId: number;
+  projectRef: string;
+  projectKey: string;
+  projectName: string;
+  teamName: string;
+}
+
 export interface IssueFieldValue {
   fieldId: number;
   name: string;
@@ -376,6 +384,19 @@ export const searchIssues = (projectKey: string, params: { q?: string; limit?: n
   if (params.q) qs.set('q', params.q);
   if (params.limit != null) qs.set('limit', String(params.limit));
   return request<IssueSearchHit[]>(`/projects/${projectKey}/issues/search?${qs.toString()}`);
+};
+
+export const searchAllIssues = (params: {
+  q: string;
+  limit?: number;
+  perProjectLimit?: number;
+  excludeProjectId?: number;
+}) => {
+  const qs = new URLSearchParams({ q: params.q });
+  if (params.limit != null) qs.set('limit', String(params.limit));
+  if (params.perProjectLimit != null) qs.set('perProjectLimit', String(params.perProjectLimit));
+  if (params.excludeProjectId != null) qs.set('excludeProjectId', String(params.excludeProjectId));
+  return request<CrossProjectIssueHit[]>(`/issues/search?${qs.toString()}`);
 };
 
 // Relations between issues. The relation reads from the issue in the path: it
