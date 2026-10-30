@@ -62,7 +62,7 @@ jobs:
           platforms: linux/${{ matrix.platform.arch }}
           cache-from: type=gha,scope=${{ matrix.service }}-${{ matrix.platform.arch }}
           cache-to: type=gha,mode=max,scope=${{ matrix.service }}-${{ matrix.platform.arch }}
-          outputs: type=image,name=${{ env.REGISTRY }}/${{ github.repository }}-${{ matrix.service }},push-by-digest=true,name-canonical=true,push=true
+          outputs: type=image,name=${{ env.REGISTRY }}/${{ github.repository_owner }}/snyamson-desk-${{ matrix.service }},push-by-digest=true,name-canonical=true,push=true
 
       - name: Keep the digest for the manifest
         run: |
@@ -102,7 +102,7 @@ jobs:
       # A prerelease carries a suffix (v1.2.3-rc.1) and must not move `latest`.
       - name: Tag the manifest
         env:
-          IMAGE: ${{ env.REGISTRY }}/${{ github.repository }}-${{ matrix.service }}
+          IMAGE: ${{ env.REGISTRY }}/${{ github.repository_owner }}/snyamson-desk-${{ matrix.service }}
           TAG: ${{ inputs.tag }}
         run: |
           set -euo pipefail
