@@ -272,5 +272,26 @@
     "pageNumbers": "Sayfa numaraları"
   },
   "print": "Yazdır",
-  "tableOfContents": "İçindekiler"
+  "tableOfContents": "İçindekiler",
+  "coverAdd": "Kapak ekle",
+  "coverChange": "Kapağı değiştir",
+  "coverRemove": "Kapağı kaldır",
+  "coverReposition": "Yeniden konumlandır",
+  "coverPosition": "Kapak konumu",
+  "coverTitle": "Kapak görseli",
+  "coverDescription": "Bir görsel yükleyin veya bu sayfanın dosyalarından seçin.",
+  "coverUpload": "Görsel yükle",
+  "coverFromAssets": "Bu sayfadaki görseller",
+  "coverNoImages": "Bu sayfada henüz görsel yok.",
+  "tagAdd": "Etiket ekle",
+  "tagsLabel": "Etiketler",
+  "tagRemove": "{tag} etiketini kaldır",
+  "tagInputLabel": "Yeni etiket",
+  "tagPlaceholder": "Etiket ekle…",
+  "tagFilter": "Etiket",
+  "anyTag": "Herhangi bir etiket",
+  "statsWords": "Kelime",
+  "statsCharacters": "Karakter",
+  "statsReadingTime": "Okuma süresi",
+  "readingMinutes": "{minutes} dk"
 }

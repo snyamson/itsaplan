@@ -23,7 +23,15 @@ import {
   useUploadDocumentAsset,
   useUpdateDocument,
 } from '../services/documents.service';
+import {
+  documentCover,
+  documentTags,
+  withDocumentCover,
+  withDocumentTags,
+  type DocumentCover as DocumentCoverValue,
+} from '../utils/documentMetadata';
 import DocumentConflictBanner from './DocumentConflictBanner';
+import DocumentCoverDialog from './DocumentCoverDialog';
 import DocumentDeleteDialog from './DocumentDeleteDialog';
 import DocumentDiscardDraftDialog from './DocumentDiscardDraftDialog';
 import DocumentEditorCanvas from './DocumentEditorCanvas';
@@ -76,6 +84,7 @@ export default function DocumentEditor({
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [discardOpen, setDiscardOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [coverOpen, setCoverOpen] = useState(false);
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [commentSelection, setCommentSelection] = useState<DocumentSelection | null>(null);
   const [inspectorOpen, setInspectorOpen] = useState(false);
@@ -193,6 +202,22 @@ export default function DocumentEditor({
       }
     });
 
+  const cover = documentCover(document.metadata);
+  const tags = documentTags(document.metadata);
+  const latestDocument = useRef(document);
+  latestDocument.current = document;
+  const saveMetadata = (
+    update: (metadata: ProjectDocument['metadata']) => ProjectDocument['metadata'],
+  ) =>
+    void runVersioned((baseVersion) =>
+      updateDocument.mutateAsync({
+        documentId: document.id,
+        patch: { version: baseVersion, metadata: update(latestDocument.current.metadata) },
+      }),
+    );
+  const changeCover = (next: DocumentCoverValue | null) =>
+    saveMetadata((metadata) => withDocumentCover(metadata, next));
+
   const updateLabel = authorName
     ? t('updatedBy', { name: authorName, time: relativeTime(document.updatedAt) })
     : t('updated', { time: relativeTime(document.updatedAt) });
@@ -236,6 +261,8 @@ export default function DocumentEditor({
               }),
             );
           }}
+          onCoverPick={() => setCoverOpen(true)}
+          onCoverRemove={() => changeCover(null)}
           onStickyToolbarChange={setStickyToolbar}
           onCreateChild={onCreateChild}
           onDuplicate={() => {
@@ -326,6 +353,8 @@ export default function DocumentEditor({
           editorRevision={editorRevision}
           editor={editor}
           titleRef={titleRef}
+          cover={cover}
+          tags={tags}
           editable={editorEditable && collaboration.ready}
           collaborative
           onComment={() => {
@@ -355,6 +384,11 @@ export default function DocumentEditor({
               }),
             );
           }}
+          onCoverChange={changeCover}
+          onCoverPick={() => setCoverOpen(true)}
+          onTagsChange={(update) =>
+            saveMetadata((metadata) => withDocumentTags(metadata, update(documentTags(metadata))))
+          }
           onContentChange={({ markdown, json }) => setContent(markdown, json)}
           onContentBlur={() => {
             void collaboration.flush();
@@ -408,6 +442,13 @@ export default function DocumentEditor({
           }}
         />
       )}
+      <DocumentCoverDialog
+        open={coverOpen}
+        projectKey={projectKey}
+        documentId={document.id}
+        onOpenChange={setCoverOpen}
+        onSelect={(url) => changeCover({ url, position: 50 })}
+      />
       <DocumentHistoryDialog
         open={historyOpen}
         projectKey={projectKey}

@@ -272,5 +272,26 @@
     "pageNumbers": "Números de página"
   },
   "print": "Imprimir",
-  "tableOfContents": "Contenido"
+  "tableOfContents": "Contenido",
+  "coverAdd": "Añadir portada",
+  "coverChange": "Cambiar portada",
+  "coverRemove": "Quitar portada",
+  "coverReposition": "Reposicionar",
+  "coverPosition": "Posición de la portada",
+  "coverTitle": "Imagen de portada",
+  "coverDescription": "Sube una imagen o elige una de los archivos de esta página.",
+  "coverUpload": "Subir imagen",
+  "coverFromAssets": "Imágenes de esta página",
+  "coverNoImages": "Aún no hay imágenes en esta página.",
+  "tagAdd": "Añadir etiqueta",
+  "tagsLabel": "Etiquetas",
+  "tagRemove": "Quitar etiqueta {tag}",
+  "tagInputLabel": "Nueva etiqueta",
+  "tagPlaceholder": "Añadir etiqueta…",
+  "tagFilter": "Etiqueta",
+  "anyTag": "Cualquier etiqueta",
+  "statsWords": "Palabras",
+  "statsCharacters": "Caracteres",
+  "statsReadingTime": "Tiempo de lectura",
+  "readingMinutes": "{minutes} min"
 }

@@ -272,5 +272,26 @@
     "pageNumbers": "أرقام الصفحات"
   },
   "print": "طباعة",
-  "tableOfContents": "المحتويات"
+  "tableOfContents": "المحتويات",
+  "coverAdd": "إضافة غلاف",
+  "coverChange": "تغيير الغلاف",
+  "coverRemove": "إزالة الغلاف",
+  "coverReposition": "إعادة التموضع",
+  "coverPosition": "موضع الغلاف",
+  "coverTitle": "صورة الغلاف",
+  "coverDescription": "ارفع صورة أو اختر واحدة من ملفات هذه الصفحة.",
+  "coverUpload": "رفع صورة",
+  "coverFromAssets": "صور هذه الصفحة",
+  "coverNoImages": "لا توجد صور في هذه الصفحة بعد.",
+  "tagAdd": "إضافة وسم",
+  "tagsLabel": "الوسوم",
+  "tagRemove": "إزالة الوسم {tag}",
+  "tagInputLabel": "وسم جديد",
+  "tagPlaceholder": "أضف وسمًا…",
+  "tagFilter": "وسم",
+  "anyTag": "أي وسم",
+  "statsWords": "الكلمات",
+  "statsCharacters": "الأحرف",
+  "statsReadingTime": "وقت القراءة",
+  "readingMinutes": "{minutes} د"
 }

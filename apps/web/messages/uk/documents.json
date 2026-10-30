@@ -272,5 +272,26 @@
     "pageNumbers": "Номери сторінок"
   },
   "print": "Друк",
-  "tableOfContents": "Зміст"
+  "tableOfContents": "Зміст",
+  "coverAdd": "Додати обкладинку",
+  "coverChange": "Змінити обкладинку",
+  "coverRemove": "Прибрати обкладинку",
+  "coverReposition": "Змістити",
+  "coverPosition": "Положення обкладинки",
+  "coverTitle": "Обкладинка",
+  "coverDescription": "Завантажте зображення або виберіть серед файлів цієї сторінки.",
+  "coverUpload": "Завантажити зображення",
+  "coverFromAssets": "Зображення сторінки",
+  "coverNoImages": "На цій сторінці ще немає зображень.",
+  "tagAdd": "Додати тег",
+  "tagsLabel": "Теги",
+  "tagRemove": "Видалити тег {tag}",
+  "tagInputLabel": "Новий тег",
+  "tagPlaceholder": "Додати тег…",
+  "tagFilter": "Тег",
+  "anyTag": "Будь-який тег",
+  "statsWords": "Слів",
+  "statsCharacters": "Символів",
+  "statsReadingTime": "Час читання",
+  "readingMinutes": "{minutes} хв"
 }

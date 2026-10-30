@@ -272,5 +272,26 @@
     "pageNumbers": "Nomor halaman"
   },
   "print": "Cetak",
-  "tableOfContents": "Daftar isi"
+  "tableOfContents": "Daftar isi",
+  "coverAdd": "Tambah sampul",
+  "coverChange": "Ganti sampul",
+  "coverRemove": "Hapus sampul",
+  "coverReposition": "Ubah posisi",
+  "coverPosition": "Posisi sampul",
+  "coverTitle": "Gambar sampul",
+  "coverDescription": "Unggah gambar atau pilih dari file halaman ini.",
+  "coverUpload": "Unggah gambar",
+  "coverFromAssets": "Gambar di halaman ini",
+  "coverNoImages": "Belum ada gambar di halaman ini.",
+  "tagAdd": "Tambah tag",
+  "tagsLabel": "Tag",
+  "tagRemove": "Hapus tag {tag}",
+  "tagInputLabel": "Tag baru",
+  "tagPlaceholder": "Tambah tag…",
+  "tagFilter": "Tag",
+  "anyTag": "Tag apa pun",
+  "statsWords": "Kata",
+  "statsCharacters": "Karakter",
+  "statsReadingTime": "Waktu baca",
+  "readingMinutes": "{minutes} mnt"
 }

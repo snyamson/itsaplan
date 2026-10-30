@@ -272,5 +272,26 @@
     "pageNumbers": "Page numbers"
   },
   "print": "Print",
-  "tableOfContents": "Contents"
+  "tableOfContents": "Contents",
+  "coverAdd": "Add cover",
+  "coverChange": "Change cover",
+  "coverRemove": "Remove cover",
+  "coverReposition": "Reposition",
+  "coverPosition": "Cover position",
+  "coverTitle": "Cover image",
+  "coverDescription": "Upload an image or pick one from this page's files.",
+  "coverUpload": "Upload image",
+  "coverFromAssets": "Images on this page",
+  "coverNoImages": "No images on this page yet.",
+  "tagAdd": "Add tag",
+  "tagsLabel": "Tags",
+  "tagRemove": "Remove tag {tag}",
+  "tagInputLabel": "New tag",
+  "tagPlaceholder": "Add a tag…",
+  "tagFilter": "Tag",
+  "anyTag": "Any tag",
+  "statsWords": "Words",
+  "statsCharacters": "Characters",
+  "statsReadingTime": "Reading time",
+  "readingMinutes": "{minutes} min"
 }

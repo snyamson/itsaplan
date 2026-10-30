@@ -26,7 +26,7 @@ import { formatDateTime } from '@/utils/dates';
 import { issuePath } from '@/utils/paths';
 import IssuePickerDialog from '@/components/common/overlay/IssuePickerDialog';
 import ArchivedBadge from '@/components/common/ArchivedBadge';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import {
   useDeleteDocumentAsset,
   useDocumentAssetsQuery,
@@ -35,6 +35,7 @@ import {
   useUnlinkDocumentIssue,
   useUploadDocumentAsset,
 } from '../services/documents.service';
+import { documentStats } from '../utils/documentMetadata';
 
 type OutlineItem = { level: number; position: number; text: string };
 
@@ -60,6 +61,7 @@ export default function DocumentSidePanel({
   onOpenHistory: () => void;
 }) {
   const t = useTranslations('documents');
+  const locale = useLocale();
   const fileInput = useRef<HTMLInputElement>(null);
   const [outlineRevision, setOutlineRevision] = useState(0);
   const [issuePickerOpen, setIssuePickerOpen] = useState(false);
@@ -69,6 +71,12 @@ export default function DocumentSidePanel({
   const remove = useDeleteDocumentAsset(projectKey, document.id);
   const linkIssue = useLinkDocumentIssue(projectKey);
   const unlinkIssue = useUnlinkDocumentIssue(projectKey);
+  const stats = useMemo(() => {
+    void outlineRevision;
+    const text =
+      editor && !editor.isDestroyed ? editor.getText({ blockSeparator: '\n' }) : document.content;
+    return documentStats(text);
+  }, [editor, outlineRevision, document.content]);
   const linkedIssueIds = new Set((issueLinks.data ?? []).map((link) => link.issueId));
 
   useEffect(() => {
@@ -198,6 +206,20 @@ export default function DocumentSidePanel({
             <dt className="text-muted-foreground">{t('updatedAt')}</dt>
             <dd className="text-end font-medium">
               <time dateTime={document.updatedAt}>{formatDateTime(document.updatedAt)}</time>
+            </dd>
+          </div>
+          <div className="flex items-start justify-between gap-4 py-3">
+            <dt className="text-muted-foreground">{t('statsWords')}</dt>
+            <dd className="font-medium tabular-nums">{stats.words.toLocaleString(locale)}</dd>
+          </div>
+          <div className="flex items-start justify-between gap-4 py-3">
+            <dt className="text-muted-foreground">{t('statsCharacters')}</dt>
+            <dd className="font-medium tabular-nums">{stats.characters.toLocaleString(locale)}</dd>
+          </div>
+          <div className="flex items-start justify-between gap-4 py-3">
+            <dt className="text-muted-foreground">{t('statsReadingTime')}</dt>
+            <dd className="font-medium">
+              {t('readingMinutes', { minutes: stats.readingMinutes })}
             </dd>
           </div>
           <div className="flex items-start justify-between gap-4 py-3">

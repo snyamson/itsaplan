@@ -272,5 +272,26 @@
     "pageNumbers": "شماره صفحه"
   },
   "print": "چاپ",
-  "tableOfContents": "فهرست"
+  "tableOfContents": "فهرست",
+  "coverAdd": "افزودن جلد",
+  "coverChange": "تغییر جلد",
+  "coverRemove": "حذف جلد",
+  "coverReposition": "تغییر جایگاه",
+  "coverPosition": "جایگاه جلد",
+  "coverTitle": "تصویر جلد",
+  "coverDescription": "تصویری بارگذاری کنید یا از فایل‌های این صفحه انتخاب کنید.",
+  "coverUpload": "بارگذاری تصویر",
+  "coverFromAssets": "تصاویر این صفحه",
+  "coverNoImages": "هنوز تصویری در این صفحه نیست.",
+  "tagAdd": "افزودن برچسب",
+  "tagsLabel": "برچسب‌ها",
+  "tagRemove": "حذف برچسب {tag}",
+  "tagInputLabel": "برچسب جدید",
+  "tagPlaceholder": "افزودن برچسب…",
+  "tagFilter": "برچسب",
+  "anyTag": "هر برچسب",
+  "statsWords": "کلمه‌ها",
+  "statsCharacters": "نویسه‌ها",
+  "statsReadingTime": "زمان مطالعه",
+  "readingMinutes": "{minutes} دقیقه"
 }

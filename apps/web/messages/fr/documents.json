@@ -272,5 +272,26 @@
     "pageNumbers": "Numéros de page"
   },
   "print": "Imprimer",
-  "tableOfContents": "Sommaire"
+  "tableOfContents": "Sommaire",
+  "coverAdd": "Ajouter une couverture",
+  "coverChange": "Changer la couverture",
+  "coverRemove": "Retirer la couverture",
+  "coverReposition": "Repositionner",
+  "coverPosition": "Position de la couverture",
+  "coverTitle": "Image de couverture",
+  "coverDescription": "Importez une image ou choisissez-en une parmi les fichiers de cette page.",
+  "coverUpload": "Importer une image",
+  "coverFromAssets": "Images de cette page",
+  "coverNoImages": "Aucune image sur cette page pour le moment.",
+  "tagAdd": "Ajouter une étiquette",
+  "tagsLabel": "Étiquettes",
+  "tagRemove": "Retirer l'étiquette {tag}",
+  "tagInputLabel": "Nouvelle étiquette",
+  "tagPlaceholder": "Ajouter une étiquette…",
+  "tagFilter": "Étiquette",
+  "anyTag": "Toute étiquette",
+  "statsWords": "Mots",
+  "statsCharacters": "Caractères",
+  "statsReadingTime": "Temps de lecture",
+  "readingMinutes": "{minutes} min"
 }

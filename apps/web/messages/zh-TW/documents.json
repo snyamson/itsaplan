@@ -272,5 +272,26 @@
     "pageNumbers": "頁碼"
   },
   "print": "列印",
-  "tableOfContents": "目錄"
+  "tableOfContents": "目錄",
+  "coverAdd": "新增封面",
+  "coverChange": "更換封面",
+  "coverRemove": "移除封面",
+  "coverReposition": "調整位置",
+  "coverPosition": "封面位置",
+  "coverTitle": "封面圖片",
+  "coverDescription": "上傳圖片，或從此頁面的檔案中選擇。",
+  "coverUpload": "上傳圖片",
+  "coverFromAssets": "此頁面的圖片",
+  "coverNoImages": "此頁面尚無圖片。",
+  "tagAdd": "新增標籤",
+  "tagsLabel": "標籤",
+  "tagRemove": "移除標籤 {tag}",
+  "tagInputLabel": "新標籤",
+  "tagPlaceholder": "新增標籤…",
+  "tagFilter": "標籤",
+  "anyTag": "任何標籤",
+  "statsWords": "字數",
+  "statsCharacters": "字元數",
+  "statsReadingTime": "閱讀時間",
+  "readingMinutes": "{minutes} 分鐘"
 }

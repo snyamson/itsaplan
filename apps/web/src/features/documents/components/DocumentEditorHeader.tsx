@@ -38,6 +38,8 @@ export default function DocumentEditorHeader({
   onBack,
   onRetrySave,
   onFullWidthChange,
+  onCoverPick,
+  onCoverRemove,
   onStickyToolbarChange,
   onCreateChild,
   onDuplicate,
@@ -72,6 +74,8 @@ export default function DocumentEditorHeader({
   onBack: () => void;
   onRetrySave: () => void;
   onFullWidthChange: (value: boolean) => void;
+  onCoverPick: () => void;
+  onCoverRemove: () => void;
   onStickyToolbarChange: (value: boolean) => void;
   onCreateChild: () => void;
   onDuplicate: () => void;
@@ -208,6 +212,8 @@ export default function DocumentEditorHeader({
           canDelete={canDelete}
           busy={busy}
           onFullWidthChange={onFullWidthChange}
+          onCoverPick={onCoverPick}
+          onCoverRemove={onCoverRemove}
           onStickyToolbarChange={onStickyToolbarChange}
           onPrivacyChange={onPrivacyChange}
           onCreateChild={onCreateChild}

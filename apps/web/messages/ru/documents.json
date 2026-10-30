@@ -272,5 +272,26 @@
     "pageNumbers": "Номера страниц"
   },
   "print": "Печать",
-  "tableOfContents": "Содержание"
+  "tableOfContents": "Содержание",
+  "coverAdd": "Добавить обложку",
+  "coverChange": "Сменить обложку",
+  "coverRemove": "Убрать обложку",
+  "coverReposition": "Сдвинуть",
+  "coverPosition": "Положение обложки",
+  "coverTitle": "Обложка",
+  "coverDescription": "Загрузите изображение или выберите среди файлов этой страницы.",
+  "coverUpload": "Загрузить изображение",
+  "coverFromAssets": "Изображения страницы",
+  "coverNoImages": "На этой странице пока нет изображений.",
+  "tagAdd": "Добавить тег",
+  "tagsLabel": "Теги",
+  "tagRemove": "Удалить тег {tag}",
+  "tagInputLabel": "Новый тег",
+  "tagPlaceholder": "Добавить тег…",
+  "tagFilter": "Тег",
+  "anyTag": "Любой тег",
+  "statsWords": "Слов",
+  "statsCharacters": "Символов",
+  "statsReadingTime": "Время чтения",
+  "readingMinutes": "{minutes} мин"
 }

@@ -1,13 +1,17 @@
 'use client';
 
-import { useRef, type RefObject } from 'react';
+import { useRef, useState, type RefObject } from 'react';
 import type { Editor } from '@tiptap/react';
 import type { ProjectDocument } from '@/lib/api/endpoints/documents';
 import { cn } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
+import type { DocumentCover as DocumentCoverValue } from '../utils/documentMetadata';
+import DocumentCover from './DocumentCover';
 import DocumentMarkdownEditor, { insertDocumentImage } from './DocumentMarkdownEditor';
+import DocumentPageActions from './DocumentPageActions';
 import DocumentPageTitle from './DocumentPageTitle';
 import { type DocumentSelection } from './DocumentSelectionActions';
+import DocumentTags from './DocumentTags';
 import DocumentToolbar from './DocumentToolbar';
 
 export function documentToolbarPosition(stickyToolbar: boolean) {
@@ -23,6 +27,8 @@ export default function DocumentEditorCanvas({
   editorRevision,
   editor,
   titleRef,
+  cover,
+  tags,
   editable,
   collaborative = false,
   onComment,
@@ -32,6 +38,9 @@ export default function DocumentEditorCanvas({
   onTitleChange,
   onTitleSave,
   onIconChange,
+  onCoverChange,
+  onCoverPick,
+  onTagsChange,
   onContentChange,
   onContentBlur,
   onUploadImage,
@@ -44,6 +53,8 @@ export default function DocumentEditorCanvas({
   editorRevision: number;
   editor: Editor | null;
   titleRef: RefObject<HTMLTextAreaElement | null>;
+  cover: DocumentCoverValue | null;
+  tags: string[];
   editable: boolean;
   collaborative?: boolean;
   onComment?: (selection: DocumentSelection) => void;
@@ -53,6 +64,9 @@ export default function DocumentEditorCanvas({
   onTitleChange: (title: string) => void;
   onTitleSave: () => void;
   onIconChange: (icon: string | null) => void;
+  onCoverChange: (cover: DocumentCoverValue | null) => void;
+  onCoverPick: () => void;
+  onTagsChange: (update: (tags: string[]) => string[]) => void;
   onContentChange: (value: {
     markdown: string;
     json: NonNullable<ProjectDocument['contentJson']>;
@@ -62,6 +76,7 @@ export default function DocumentEditorCanvas({
 }) {
   const t = useTranslations('documents');
   const imageInput = useRef<HTMLInputElement>(null);
+  const [addingTag, setAddingTag] = useState(false);
   const editableRef = useRef(editable);
   editableRef.current = editable;
 
@@ -113,7 +128,26 @@ export default function DocumentEditorCanvas({
           />
         )}
 
-        <header className="mb-9 border-b border-border/55 pb-8">
+        {cover && (
+          <DocumentCover
+            key={cover.url}
+            cover={cover}
+            editable={editable}
+            onChange={onCoverChange}
+            onRemove={() => onCoverChange(null)}
+            onReplace={onCoverPick}
+          />
+        )}
+
+        <header className="group/header mb-9 border-b border-border/55 pb-8">
+          {editable && (
+            <DocumentPageActions
+              hasCover={cover !== null}
+              hasTags={tags.length > 0 || addingTag}
+              onAddCover={onCoverPick}
+              onAddTag={() => setAddingTag(true)}
+            />
+          )}
           <DocumentPageTitle
             ref={titleRef}
             title={title}
@@ -122,6 +156,13 @@ export default function DocumentEditorCanvas({
             onChange={onTitleChange}
             onSave={onTitleSave}
             onIconChange={onIconChange}
+          />
+          <DocumentTags
+            tags={tags}
+            editable={editable}
+            adding={addingTag}
+            onAddingChange={setAddingTag}
+            onChange={onTagsChange}
           />
           <p className="mt-3 text-xs text-muted-foreground/80" dir="auto">
             {updateLabel}

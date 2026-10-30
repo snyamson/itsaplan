@@ -9,6 +9,8 @@ import {
   Download,
   Expand,
   History,
+  ImageIcon,
+  ImageOff,
   LockKeyhole,
   MoreHorizontal,
   PanelTop,
@@ -27,6 +29,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useTranslations } from 'next-intl';
+import { documentCover } from '../utils/documentMetadata';
 import DocumentExportDialog from './DocumentExportDialog';
 
 export default function DocumentOptionsMenu({
@@ -42,6 +45,8 @@ export default function DocumentOptionsMenu({
   canDelete,
   busy,
   onFullWidthChange,
+  onCoverPick,
+  onCoverRemove,
   onStickyToolbarChange,
   onPrivacyChange,
   onCreateChild,
@@ -63,6 +68,8 @@ export default function DocumentOptionsMenu({
   canDelete: boolean;
   busy: boolean;
   onFullWidthChange: (value: boolean) => void;
+  onCoverPick: () => void;
+  onCoverRemove: () => void;
   onStickyToolbarChange: (value: boolean) => void;
   onPrivacyChange: (value: boolean) => void;
   onCreateChild: () => void;
@@ -75,6 +82,7 @@ export default function DocumentOptionsMenu({
   const t = useTranslations('documents');
   const [exportOpen, setExportOpen] = useState(false);
   const archived = document.archivedAt !== null;
+  const hasCover = documentCover(document.metadata) !== null;
 
   const copyMarkdown = useCallback(async () => {
     try {
@@ -123,6 +131,18 @@ export default function DocumentOptionsMenu({
               <Expand />
               <span className="flex-1">{t('fullWidth')}</span>
               {document.fullWidth && <Check className="text-primary" aria-hidden />}
+            </DropdownMenuItem>
+          )}
+          {canUpdate && (
+            <DropdownMenuItem disabled={busy} onSelect={onCoverPick}>
+              <ImageIcon />
+              {t(hasCover ? 'coverChange' : 'coverAdd')}
+            </DropdownMenuItem>
+          )}
+          {canUpdate && hasCover && (
+            <DropdownMenuItem disabled={busy} onSelect={onCoverRemove}>
+              <ImageOff />
+              {t('coverRemove')}
             </DropdownMenuItem>
           )}
           <DropdownMenuItem

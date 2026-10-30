@@ -272,5 +272,26 @@
     "pageNumbers": "页码"
   },
   "print": "打印",
-  "tableOfContents": "目录"
+  "tableOfContents": "目录",
+  "coverAdd": "添加封面",
+  "coverChange": "更换封面",
+  "coverRemove": "移除封面",
+  "coverReposition": "调整位置",
+  "coverPosition": "封面位置",
+  "coverTitle": "封面图片",
+  "coverDescription": "上传图片，或从本页文件中选择。",
+  "coverUpload": "上传图片",
+  "coverFromAssets": "本页图片",
+  "coverNoImages": "本页还没有图片。",
+  "tagAdd": "添加标签",
+  "tagsLabel": "标签",
+  "tagRemove": "移除标签 {tag}",
+  "tagInputLabel": "新标签",
+  "tagPlaceholder": "添加标签…",
+  "tagFilter": "标签",
+  "anyTag": "任意标签",
+  "statsWords": "字数",
+  "statsCharacters": "字符数",
+  "statsReadingTime": "阅读时间",
+  "readingMinutes": "{minutes} 分钟"
 }

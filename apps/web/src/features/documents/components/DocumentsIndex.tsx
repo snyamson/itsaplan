@@ -33,6 +33,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { useMoveDocument, useSetDocumentFavorite } from '../services/documents.service';
 import { DOCUMENT_LIST_TABS, type DocumentListTab } from '../utils/documentList';
+import { documentTags } from '../utils/documentMetadata';
 import DocumentTree, { type DocumentSort } from './DocumentTree';
 
 const SORTS = [
@@ -47,9 +48,10 @@ const defaults: {
   sort: DocumentSort;
   direction: 'asc' | 'desc';
   creator: string | null;
+  tag: string | null;
   range: 'all' | 'today' | 'week' | 'month';
   scroll: number;
-} = { sort: 'position', direction: 'asc', creator: null, range: 'all', scroll: 0 };
+} = { sort: 'position', direction: 'asc', creator: null, tag: null, range: 'all', scroll: 0 };
 
 export default function DocumentsIndex({
   projectKey,
@@ -95,6 +97,7 @@ export default function DocumentsIndex({
   const sort = SORTS.includes(preferences.sort) ? preferences.sort : 'position';
   const sortDirection = preferences.direction === 'desc' ? 'desc' : 'asc';
   const creatorId = preferences.creator;
+  const savedTag = preferences.tag ?? null;
   const createdRange = ['all', 'today', 'week', 'month'].includes(preferences.range)
     ? preferences.range
     : 'all';
@@ -102,6 +105,7 @@ export default function DocumentsIndex({
   const setSortDirection = (update: (value: 'asc' | 'desc') => 'asc' | 'desc') =>
     setPreferences((p) => ({ ...p, direction: update(p.direction) }));
   const setCreatorId = (creator: string | null) => setPreferences((p) => ({ ...p, creator }));
+  const setTag = (tag: string | null) => setPreferences((p) => ({ ...p, tag }));
   const setCreatedRange = (range: typeof defaults.range) =>
     setPreferences((p) => ({ ...p, range }));
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -125,9 +129,14 @@ export default function DocumentsIndex({
       documents.flatMap((document) => (document.createdByUserId ? [document.createdByUserId] : [])),
     ),
   ).sort((a, b) => (authorNames[a] ?? a).localeCompare(authorNames[b] ?? b));
+  const allTags = Array.from(
+    new Set(documents.flatMap((document) => documentTags(document.metadata))),
+  ).sort((a, b) => a.localeCompare(b));
+  const tagFilter = savedTag !== null && allTags.includes(savedTag) ? savedTag : null;
   const now = Date.now();
   const filteredDocuments = documents.filter((document) => {
     if (creatorId !== null && document.createdByUserId !== creatorId) return false;
+    if (tagFilter !== null && !documentTags(document.metadata).includes(tagFilter)) return false;
     if (createdRange === 'all') return true;
 
     const age = now - Date.parse(document.createdAt);
@@ -145,7 +154,8 @@ export default function DocumentsIndex({
       ? { ...document, parentId: null }
       : document,
   );
-  const filterCount = Number(creatorId !== null) + Number(createdRange !== 'all');
+  const filterCount =
+    Number(creatorId !== null) + Number(tagFilter !== null) + Number(createdRange !== 'all');
   const sortLabel = {
     position: t('manualOrder'),
     title: t('nameOrder'),
@@ -332,6 +342,25 @@ export default function DocumentsIndex({
                   ))}
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
+              {allTags.length > 0 && (
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>{t('tagFilter')}</DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent className="max-h-72 w-56 overflow-y-auto">
+                    <DropdownMenuItem onSelect={() => setTag(null)}>
+                      <Check className={cn('me-1', tagFilter !== null && 'invisible')} />
+                      {t('anyTag')}
+                    </DropdownMenuItem>
+                    {allTags.map((tag) => (
+                      <DropdownMenuItem key={tag} onSelect={() => setTag(tag)}>
+                        <Check className={cn('me-1', tagFilter !== tag && 'invisible')} />
+                        <span className="truncate" dir="auto">
+                          {tag}
+                        </span>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+              )}
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger>{t('createdDate')}</DropdownMenuSubTrigger>
                 <DropdownMenuSubContent>
@@ -349,6 +378,7 @@ export default function DocumentsIndex({
                   <DropdownMenuItem
                     onSelect={() => {
                       setCreatorId(null);
+                      setTag(null);
                       setCreatedRange('all');
                     }}
                   >
