@@ -291,7 +291,7 @@ services:
           if pg_dump --no-owner --file /tmp/database.sql \
             && restic backup --host snyamson-workspace --tag database /tmp/database.sql \
             && restic backup --host snyamson-workspace --tag files /data; then
-            restic forget --group-by tags --keep-daily 7 --keep-weekly 4 --keep-monthly 6 --prune \
+            restic forget --host snyamson-workspace --group-by tags --keep-daily 7 --keep-weekly 4 --keep-monthly 6 --prune \
               || echo '[backup] pruning failed; will retry tomorrow'
             date +%s > /tmp/last-backup
             rm -f /tmp/database.sql
