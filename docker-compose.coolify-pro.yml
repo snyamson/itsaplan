@@ -246,6 +246,69 @@ services:
       retries: 5
       start_period: 20s
 
+  # Offsite backup: a nightly pg_dump and the attachments volume go to Cloudflare R2
+  # through restic, which encrypts them on this server before upload. Keep a copy of
+  # RESTIC_PASSWORD outside this stack: without it a backup cannot be read.
+  # The first backup runs at start, later ones at BACKUP_HOUR_UTC. The healthcheck
+  # turns unhealthy when no backup has succeeded for two days.
+  # The image carries pg_dump: keep its major version equal to the postgres service.
+  backup:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGHOST: postgres
+      PGUSER: ${POSTGRES_USER:-itsaplan}
+      PGPASSWORD: ${SERVICE_PASSWORD_POSTGRES}
+      PGDATABASE: ${POSTGRES_DB:-itsaplan}
+      RESTIC_REPOSITORY: ${RESTIC_REPOSITORY:?set to s3:https://<account>.r2.cloudflarestorage.com/snyamson-desk-backup}
+      RESTIC_PASSWORD: ${RESTIC_PASSWORD:?keep a copy outside this stack}
+      AWS_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID:?}
+      AWS_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY:?}
+      BACKUP_HOUR_UTC: ${BACKUP_HOUR_UTC:-3}
+    volumes:
+      - minio-data:/data:ro
+    entrypoint: ['/bin/sh', '-c']
+    command:
+      - |
+        set -eu
+        apk add --no-cache restic > /dev/null
+        if ! check="$$(restic cat config 2>&1)"; then
+          case "$$check" in
+            *"does not exist"* | *"Is there a repository"*) restic init ;;
+            *) echo "[backup] cannot open the repository: $$check"; exit 1 ;;
+          esac
+        fi
+        while true; do
+          if pg_dump --no-owner --file /tmp/database.sql \
+            && restic backup --host snyamson-workspace --tag database /tmp/database.sql \
+            && restic backup --host snyamson-workspace --tag files /data; then
+            restic forget --group-by tags --keep-daily 7 --keep-weekly 4 --keep-monthly 6 --prune \
+              || echo '[backup] pruning failed; will retry tomorrow'
+            date +%s > /tmp/last-backup
+            rm -f /tmp/database.sql
+          else
+            echo '[backup] failed; retrying in an hour'
+            sleep 3600
+            continue
+          fi
+          hour=$${BACKUP_HOUR_UTC#0}
+          now=$$(( $$(date +%s) % 86400 ))
+          sleep $$(( ($${hour:-0} * 3600 - now + 86400) % 86400 + 60 ))
+        done
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          '[ -f /tmp/last-backup ] && [ $$(( $$(date +%s) - $$(cat /tmp/last-backup) )) -lt 172800 ]',
+        ]
+      interval: 1h
+      timeout: 10s
+      retries: 1
+      start_period: 1h
+
 volumes:
   postgres-data:
   minio-data:

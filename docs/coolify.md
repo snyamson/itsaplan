@@ -77,5 +77,32 @@ on each release, create the stack as a service instead.
 To keep an existing Public Repository resource and pull instead of build, set **Custom build
 command** in **Configuration → General** to `docker compose pull` and redeploy.
 
+## 6. Offsite backups
+
+The three Coolify compose files carry a `backup` service. Each night it dumps the database
+and copies the RustFS attachments volume to a Cloudflare R2 bucket with
+[restic](https://restic.net), which encrypts the data on the server before upload. It keeps 7
+daily, 4 weekly and 6 monthly snapshots. The first backup runs when the service starts.
+
+Create an R2 bucket (for example `snyamson-desk-backup`) and an API token with
+**Object Read & Write** on that bucket, then set these in **Environment Variables**. The
+stack does not deploy while one of the first four is missing.
+
+| Variable               | Value                                                                                  |
+| ---------------------- | -------------------------------------------------------------------------------------- |
+| `RESTIC_REPOSITORY`    | `s3:https://<account-id>.r2.cloudflarestorage.com/<bucket>`                            |
+| `RESTIC_PASSWORD`      | Encrypts the backups. Keep a copy outside this stack: without it they cannot be read.  |
+| `R2_ACCESS_KEY_ID`     | Access key ID of the R2 token                                                          |
+| `R2_SECRET_ACCESS_KEY` | Secret access key of the R2 token                                                      |
+| `BACKUP_HOUR_UTC`      | Hour of the nightly backup, 0–23. Default `3`                                          |
+
+The attachments volume is copied while RustFS is running. Each object is its own file, so a
+nightly copy is consistent per file, but an upload in progress at that moment can be missing
+or partial in that night's snapshot.
+
+The `backup` container turns unhealthy when no backup has succeeded for two days, so
+Coolify shows a failing backup. Restoring is described in
+[self-hosting.md](self-hosting.md#restoring-from-an-offsite-backup).
+
 To run the same stack outside Coolify, see [self-hosting.md](self-hosting.md) or
 [railway.md](railway.md).

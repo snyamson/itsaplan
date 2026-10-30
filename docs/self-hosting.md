@@ -260,6 +260,35 @@ docker run --rm -v itsaplan_minio-data:/data -v "$PWD":/out alpine tar czf /out/
 If you call the API from your own scripts or from an MCP client, read the
 [release notes](https://github.com/croffasia/itsaplan/releases) for the paths a release removed.
 
+## Restoring from an offsite backup
+
+The Coolify stacks back up to Cloudflare R2 (see [coolify.md](coolify.md#6-offsite-backups)).
+Run these on the server, in the stack's directory or with its project name. The `backup`
+container already holds the restic settings, so `restic` works inside it without options.
+
+```bash
+# list the snapshots: tag database is the dump, tag files is the attachments volume
+docker compose exec backup restic snapshots
+
+# restore the database into an empty database (create it first)
+docker compose exec postgres createdb -U itsaplan restored
+docker compose exec -T backup restic dump --tag database latest /tmp/database.sql \
+  | docker compose exec -T postgres psql -U itsaplan -d restored
+
+# restore the attachments: stop RustFS, unpack the snapshot into its volume, start it again
+docker compose stop minio
+docker compose exec -T backup restic dump --tag files latest /data > attachments.tar
+docker run --rm -v <project>_minio-data:/data -v "$PWD":/in alpine \
+  tar -x -f /in/attachments.tar -C /data --strip-components=1
+docker compose start minio
+```
+
+`<project>` is the Compose project name; `docker volume ls` shows the exact volume name.
+
+To restore into a fresh stack, deploy it with the same `RESTIC_*` and `R2_*` variables, then
+restore as above. Replace `latest` with a snapshot ID from `restic snapshots` to go back
+further.
+
 ## Building from source instead
 
 ```bash
