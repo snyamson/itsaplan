@@ -252,5 +252,25 @@
   },
   "selectionActions": "Selection actions",
   "recentAndFavorites": "Recent and favorites",
-  "searching": "Searching documents…"
+  "searching": "Searching documents…",
+  "pdf": "PDF",
+  "pdfExportHint": "Membuka dialog cetak. Pilih \"Simpan sebagai PDF\" sebagai tujuan.",
+  "pdfPageSize": "Ukuran halaman",
+  "pdfPageSizes": {
+    "a4": "A4",
+    "letter": "Letter"
+  },
+  "pdfMargins": "Margin",
+  "pdfMarginOptions": {
+    "narrow": "Sempit",
+    "normal": "Normal",
+    "wide": "Lebar"
+  },
+  "pdfOptions": {
+    "includeTitle": "Sertakan judul",
+    "tableOfContents": "Daftar isi",
+    "pageNumbers": "Nomor halaman"
+  },
+  "print": "Cetak",
+  "tableOfContents": "Daftar isi"
 }

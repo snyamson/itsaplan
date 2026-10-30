@@ -208,6 +208,7 @@ export default function DocumentOptionsMenu({
         open={exportOpen}
         documentId={document.id}
         title={title}
+        icon={document.icon}
         content={content}
         richHtml={richHtml}
         onOpenChange={setExportOpen}

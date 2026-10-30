@@ -252,5 +252,25 @@
     "retry": "Retry",
     "noResolved": "No resolved discussions.",
     "empty": "Select text to start a discussion."
-  }
+  },
+  "pdf": "PDF",
+  "pdfExportHint": "Відкриває вікно друку. Виберіть «Зберегти як PDF» як принтер.",
+  "pdfPageSize": "Розмір сторінки",
+  "pdfPageSizes": {
+    "a4": "A4",
+    "letter": "Letter"
+  },
+  "pdfMargins": "Поля",
+  "pdfMarginOptions": {
+    "narrow": "Вузькі",
+    "normal": "Звичайні",
+    "wide": "Широкі"
+  },
+  "pdfOptions": {
+    "includeTitle": "Додати заголовок",
+    "tableOfContents": "Зміст",
+    "pageNumbers": "Номери сторінок"
+  },
+  "print": "Друк",
+  "tableOfContents": "Зміст"
 }

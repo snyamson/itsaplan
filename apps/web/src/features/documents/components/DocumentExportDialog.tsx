@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Check, Download, FileCode2, FileText, Loader2 } from 'lucide-react';
+import { Check, Download, FileCode2, FileText, FileType2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -18,16 +18,26 @@ import {
   DocumentExportLimitError,
   type DocumentExportFormat,
 } from '../utils/documentExport';
+import {
+  defaultDocumentPrintOptions,
+  printDocumentHtml,
+  type DocumentPrintOptions,
+} from '../utils/documentPrint';
+import DocumentPrintOptionsFields from './DocumentPrintOptionsFields';
 
 const formats = [
   { key: 'markdown', icon: FileText },
   { key: 'html', icon: FileCode2 },
+  { key: 'pdf', icon: FileType2 },
 ] as const;
+
+type ExportChoice = (typeof formats)[number]['key'];
 
 export default function DocumentExportDialog({
   open,
   documentId,
   title,
+  icon,
   content,
   richHtml,
   onOpenChange,
@@ -35,12 +45,16 @@ export default function DocumentExportDialog({
   open: boolean;
   documentId: number;
   title: string;
+  icon: string | null;
   content: () => string;
   richHtml: () => string;
   onOpenChange: (open: boolean) => void;
 }) {
   const t = useTranslations('documents');
-  const [format, setFormat] = useState<DocumentExportFormat>('markdown');
+  const [format, setFormat] = useState<ExportChoice>('markdown');
+  const [printOptions, setPrintOptions] = useState<DocumentPrintOptions>(
+    defaultDocumentPrintOptions,
+  );
   const [pending, setPending] = useState(false);
   const [failure, setFailure] = useState<'generic' | 'limit' | null>(null);
   const downloadLock = useRef(false);
@@ -65,10 +79,18 @@ export default function DocumentExportDialog({
         title,
         content: content(),
         richHtml: richHtml(),
-        format,
+        format: format === 'pdf' ? 'html' : (format satisfies DocumentExportFormat),
         documentId,
         baseUrl: window.location.origin,
       });
+      if (format === 'pdf') {
+        await printDocumentHtml(await result.blob.text(), printOptions, {
+          icon,
+          tocLabel: t('tableOfContents'),
+        });
+        onOpenChange(false);
+        return;
+      }
       const url = URL.createObjectURL(result.blob);
       const anchor = window.document.createElement('a');
       anchor.href = url;
@@ -132,9 +154,9 @@ export default function DocumentExportDialog({
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block text-sm font-medium">{t(key)}</span>
-                  {key === 'markdown' && (
+                  {(key === 'markdown' || key === 'pdf') && (
                     <span className="mt-0.5 block text-xs leading-4 text-muted-foreground">
-                      {t('markdownExportHint')}
+                      {t(key === 'markdown' ? 'markdownExportHint' : 'pdfExportHint')}
                     </span>
                   )}
                 </span>
@@ -151,6 +173,14 @@ export default function DocumentExportDialog({
             );
           })}
         </div>
+
+        {format === 'pdf' && (
+          <DocumentPrintOptionsFields
+            value={printOptions}
+            disabled={pending}
+            onChange={setPrintOptions}
+          />
+        )}
 
         {failure && (
           <p
@@ -172,7 +202,7 @@ export default function DocumentExportDialog({
           </Button>
           <Button type="button" disabled={pending} onClick={() => void download()}>
             {pending ? <Loader2 className="animate-spin" /> : <Download />}
-            {pending ? t('exporting') : t('download')}
+            {pending ? t('exporting') : t(format === 'pdf' ? 'print' : 'download')}
           </Button>
         </DialogFooter>
       </DialogContent>

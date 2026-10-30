@@ -45,7 +45,7 @@ describe('document export', () => {
       '<SCRIPT>alert(1)</SCRIPT><img src="x" onerror="alert(2)"><a href="JaVaScRiPt:alert(3)">Unsafe</a><svg onload="alert(4)"></svg>Safe',
       'html',
     );
-    assert.match(html, /<h1>&lt;Guide&gt;<\/h1>/);
+    assert.match(html, /<h1 data-document-title>&lt;Guide&gt;<\/h1>/);
     assertSanitizedHtml(html);
     assert.match(html, /Safe/);
   });

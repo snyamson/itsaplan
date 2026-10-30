@@ -252,5 +252,25 @@
     "retry": "Retry",
     "noResolved": "No resolved discussions.",
     "empty": "Select text to start a discussion."
-  }
+  },
+  "pdf": "PDF",
+  "pdfExportHint": "Opens the print dialog. Choose \"Save as PDF\" as the destination.",
+  "pdfPageSize": "Page size",
+  "pdfPageSizes": {
+    "a4": "A4",
+    "letter": "Letter"
+  },
+  "pdfMargins": "Margins",
+  "pdfMarginOptions": {
+    "narrow": "Narrow",
+    "normal": "Normal",
+    "wide": "Wide"
+  },
+  "pdfOptions": {
+    "includeTitle": "Include title",
+    "tableOfContents": "Table of contents",
+    "pageNumbers": "Page numbers"
+  },
+  "print": "Print",
+  "tableOfContents": "Contents"
 }

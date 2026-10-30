@@ -252,5 +252,25 @@
   },
   "selectionActions": "Selection actions",
   "recentAndFavorites": "Recent and favorites",
-  "searching": "Searching documents…"
+  "searching": "Searching documents…",
+  "pdf": "PDF",
+  "pdfExportHint": "Abre a caixa de impressão. Escolha \"Salvar como PDF\" como destino.",
+  "pdfPageSize": "Tamanho da página",
+  "pdfPageSizes": {
+    "a4": "A4",
+    "letter": "Carta"
+  },
+  "pdfMargins": "Margens",
+  "pdfMarginOptions": {
+    "narrow": "Estreitas",
+    "normal": "Normais",
+    "wide": "Largas"
+  },
+  "pdfOptions": {
+    "includeTitle": "Incluir título",
+    "tableOfContents": "Índice",
+    "pageNumbers": "Números de página"
+  },
+  "print": "Imprimir",
+  "tableOfContents": "Sumário"
 }

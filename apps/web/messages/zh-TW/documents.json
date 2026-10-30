@@ -252,5 +252,25 @@
     "retry": "重試",
     "noResolved": "沒有已解決的討論。",
     "empty": "選取文字即可開始討論。"
-  }
+  },
+  "pdf": "PDF",
+  "pdfExportHint": "開啟列印對話框。請選擇「另存為 PDF」作為目的地。",
+  "pdfPageSize": "頁面大小",
+  "pdfPageSizes": {
+    "a4": "A4",
+    "letter": "Letter"
+  },
+  "pdfMargins": "邊界",
+  "pdfMarginOptions": {
+    "narrow": "窄",
+    "normal": "標準",
+    "wide": "寬"
+  },
+  "pdfOptions": {
+    "includeTitle": "包含標題",
+    "tableOfContents": "目錄",
+    "pageNumbers": "頁碼"
+  },
+  "print": "列印",
+  "tableOfContents": "目錄"
 }

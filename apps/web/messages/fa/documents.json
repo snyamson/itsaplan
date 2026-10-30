@@ -252,5 +252,25 @@
     "retry": "تلاش دوباره",
     "noResolved": "گفتگوی حل‌شده‌ای وجود ندارد.",
     "empty": "برای شروع گفتگو متنی را انتخاب کنید."
-  }
+  },
+  "pdf": "PDF",
+  "pdfExportHint": "پنجره چاپ را باز می‌کند. «ذخیره به‌عنوان PDF» را به‌عنوان مقصد انتخاب کنید.",
+  "pdfPageSize": "اندازه صفحه",
+  "pdfPageSizes": {
+    "a4": "A4",
+    "letter": "Letter"
+  },
+  "pdfMargins": "حاشیه‌ها",
+  "pdfMarginOptions": {
+    "narrow": "باریک",
+    "normal": "معمولی",
+    "wide": "پهن"
+  },
+  "pdfOptions": {
+    "includeTitle": "شامل عنوان",
+    "tableOfContents": "فهرست مطالب",
+    "pageNumbers": "شماره صفحه"
+  },
+  "print": "چاپ",
+  "tableOfContents": "فهرست"
 }

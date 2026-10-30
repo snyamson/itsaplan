@@ -252,5 +252,25 @@
     "retry": "Retry",
     "noResolved": "No resolved discussions.",
     "empty": "Select text to start a discussion."
-  }
+  },
+  "pdf": "PDF",
+  "pdfExportHint": "يفتح نافذة الطباعة. اختر «حفظ كملف PDF» كوجهة.",
+  "pdfPageSize": "حجم الصفحة",
+  "pdfPageSizes": {
+    "a4": "A4",
+    "letter": "Letter"
+  },
+  "pdfMargins": "الهوامش",
+  "pdfMarginOptions": {
+    "narrow": "ضيقة",
+    "normal": "عادية",
+    "wide": "واسعة"
+  },
+  "pdfOptions": {
+    "includeTitle": "تضمين العنوان",
+    "tableOfContents": "جدول المحتويات",
+    "pageNumbers": "أرقام الصفحات"
+  },
+  "print": "طباعة",
+  "tableOfContents": "المحتويات"
 }

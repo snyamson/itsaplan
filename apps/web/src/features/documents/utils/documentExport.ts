@@ -78,7 +78,7 @@ export function documentExportBody(
     return `${title.trim() ? `# ${title.trim()}\n\n` : ''}${content}`;
   }
 
-  const heading = title.trim() ? `<h1>${escapeHtml(title.trim())}</h1>` : '';
+  const heading = title.trim() ? `<h1 data-document-title>${escapeHtml(title.trim())}</h1>` : '';
   return `<!doctype html>
 <html lang="en">
 <head>

@@ -252,5 +252,25 @@
     "retry": "Reintentar",
     "noResolved": "No hay discusiones resueltas.",
     "empty": "Selecciona texto para iniciar una discusión."
-  }
+  },
+  "pdf": "PDF",
+  "pdfExportHint": "Abre el cuadro de impresión. Elige \"Guardar como PDF\" como destino.",
+  "pdfPageSize": "Tamaño de página",
+  "pdfPageSizes": {
+    "a4": "A4",
+    "letter": "Carta"
+  },
+  "pdfMargins": "Márgenes",
+  "pdfMarginOptions": {
+    "narrow": "Estrechos",
+    "normal": "Normales",
+    "wide": "Amplios"
+  },
+  "pdfOptions": {
+    "includeTitle": "Incluir título",
+    "tableOfContents": "Tabla de contenido",
+    "pageNumbers": "Números de página"
+  },
+  "print": "Imprimir",
+  "tableOfContents": "Contenido"
 }

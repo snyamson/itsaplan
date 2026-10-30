@@ -252,5 +252,25 @@
     "retry": "다시 시도",
     "noResolved": "해결된 논의가 없습니다.",
     "empty": "텍스트를 선택하여 논의를 시작하세요."
-  }
+  },
+  "pdf": "PDF",
+  "pdfExportHint": "인쇄 창을 엽니다. 대상으로 \"PDF로 저장\"을 선택하세요.",
+  "pdfPageSize": "페이지 크기",
+  "pdfPageSizes": {
+    "a4": "A4",
+    "letter": "Letter"
+  },
+  "pdfMargins": "여백",
+  "pdfMarginOptions": {
+    "narrow": "좁게",
+    "normal": "보통",
+    "wide": "넓게"
+  },
+  "pdfOptions": {
+    "includeTitle": "제목 포함",
+    "tableOfContents": "목차",
+    "pageNumbers": "페이지 번호"
+  },
+  "print": "인쇄",
+  "tableOfContents": "목차"
 }

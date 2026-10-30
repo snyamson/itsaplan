@@ -252,5 +252,25 @@
     "retry": "Retry",
     "noResolved": "No resolved discussions.",
     "empty": "Select text to start a discussion."
-  }
+  },
+  "pdf": "PDF",
+  "pdfExportHint": "打开打印对话框。请选择“另存为 PDF”作为目标。",
+  "pdfPageSize": "页面大小",
+  "pdfPageSizes": {
+    "a4": "A4",
+    "letter": "Letter"
+  },
+  "pdfMargins": "页边距",
+  "pdfMarginOptions": {
+    "narrow": "窄",
+    "normal": "正常",
+    "wide": "宽"
+  },
+  "pdfOptions": {
+    "includeTitle": "包含标题",
+    "tableOfContents": "目录",
+    "pageNumbers": "页码"
+  },
+  "print": "打印",
+  "tableOfContents": "目录"
 }

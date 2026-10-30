@@ -252,5 +252,25 @@
     "retry": "Retry",
     "noResolved": "No resolved discussions.",
     "empty": "Select text to start a discussion."
-  }
+  },
+  "pdf": "PDF",
+  "pdfExportHint": "Ouvre la boîte d'impression. Choisissez « Enregistrer au format PDF » comme destination.",
+  "pdfPageSize": "Taille de page",
+  "pdfPageSizes": {
+    "a4": "A4",
+    "letter": "Lettre"
+  },
+  "pdfMargins": "Marges",
+  "pdfMarginOptions": {
+    "narrow": "Étroites",
+    "normal": "Normales",
+    "wide": "Larges"
+  },
+  "pdfOptions": {
+    "includeTitle": "Inclure le titre",
+    "tableOfContents": "Table des matières",
+    "pageNumbers": "Numéros de page"
+  },
+  "print": "Imprimer",
+  "tableOfContents": "Sommaire"
 }

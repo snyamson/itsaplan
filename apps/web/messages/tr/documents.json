@@ -252,5 +252,25 @@
     "retry": "Tekrar dene",
     "noResolved": "Çözülmüş tartışma yok.",
     "empty": "Bir tartışma başlatmak için metin seçin."
-  }
+  },
+  "pdf": "PDF",
+  "pdfExportHint": "Yazdırma penceresini açar. Hedef olarak \"PDF olarak kaydet\" seçin.",
+  "pdfPageSize": "Sayfa boyutu",
+  "pdfPageSizes": {
+    "a4": "A4",
+    "letter": "Letter"
+  },
+  "pdfMargins": "Kenar boşlukları",
+  "pdfMarginOptions": {
+    "narrow": "Dar",
+    "normal": "Normal",
+    "wide": "Geniş"
+  },
+  "pdfOptions": {
+    "includeTitle": "Başlığı ekle",
+    "tableOfContents": "İçindekiler",
+    "pageNumbers": "Sayfa numaraları"
+  },
+  "print": "Yazdır",
+  "tableOfContents": "İçindekiler"
 }

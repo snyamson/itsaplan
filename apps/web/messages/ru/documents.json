@@ -252,5 +252,25 @@
     "retry": "Повторить",
     "noResolved": "Закрытых обсуждений пока нет.",
     "empty": "Выделите текст, чтобы начать обсуждение."
-  }
+  },
+  "pdf": "PDF",
+  "pdfExportHint": "Открывает окно печати. Выберите «Сохранить как PDF» в качестве принтера.",
+  "pdfPageSize": "Размер страницы",
+  "pdfPageSizes": {
+    "a4": "A4",
+    "letter": "Letter"
+  },
+  "pdfMargins": "Поля",
+  "pdfMarginOptions": {
+    "narrow": "Узкие",
+    "normal": "Обычные",
+    "wide": "Широкие"
+  },
+  "pdfOptions": {
+    "includeTitle": "Включить заголовок",
+    "tableOfContents": "Оглавление",
+    "pageNumbers": "Номера страниц"
+  },
+  "print": "Печать",
+  "tableOfContents": "Содержание"
 }
