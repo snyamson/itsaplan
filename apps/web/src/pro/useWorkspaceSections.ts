@@ -2,7 +2,7 @@
 
 import type { WorkspaceSummary } from '@/lib/api/endpoints/workspaces';
 import type { WorkspaceSection } from '@/features/teams/types/workspaceSection';
-import WorkspaceScimSection from '@/features/teams/components/workspace/scim/WorkspaceScimSection';
+import WorkspaceScimSection from './scim/WorkspaceScimSection';
 import coreSections from '../ce/useWorkspaceSections';
 import WorkspaceAuditLogSection from './audit-log/WorkspaceAuditLogSection';
 import WorkspaceDashboardSection from './dashboard/WorkspaceDashboardSection';

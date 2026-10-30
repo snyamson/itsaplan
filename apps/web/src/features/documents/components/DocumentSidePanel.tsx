@@ -35,7 +35,7 @@ import {
   useUnlinkDocumentIssue,
   useUploadDocumentAsset,
 } from '../services/documents.service';
-import { documentStats } from '../utils/documentMetadata';
+import { useDocumentStats } from '../hooks/useDocumentStats';
 
 export default function DocumentSidePanel({
   projectKey,
@@ -68,12 +68,7 @@ export default function DocumentSidePanel({
   const remove = useDeleteDocumentAsset(projectKey, document.id);
   const linkIssue = useLinkDocumentIssue(projectKey);
   const unlinkIssue = useUnlinkDocumentIssue(projectKey);
-  const stats = useMemo(() => {
-    void outlineRevision;
-    const text =
-      editor && !editor.isDestroyed ? editor.getText({ blockSeparator: '\n' }) : document.content;
-    return documentStats(text);
-  }, [editor, outlineRevision, document.content]);
+  const stats = useDocumentStats(editor, document.content);
   const linkedIssueIds = new Set((issueLinks.data ?? []).map((link) => link.issueId));
 
   const insertAsset = (asset: { contentType: string; filename: string; url: string }) => {
