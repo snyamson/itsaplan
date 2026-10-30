@@ -1,0 +1,29 @@
+name: Desk smoke test
+
+# Probes the live stack from outside. Runs on a schedule, so an outage such as a proxy
+# that stopped routing the domain fails a run, and can be called by a deploy workflow
+# right after it redeploys. Set the repository variables DESK_WEB_URL and DESK_API_URL;
+# without them the job is skipped.
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    name: Smoke test
+    if: ${{ vars.DESK_WEB_URL != '' && vars.DESK_API_URL != '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      DESK_WEB_URL: ${{ vars.DESK_WEB_URL }}
+      DESK_API_URL: ${{ vars.DESK_API_URL }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Probe the stack
+        run: |
+          bash scripts/smoke-test.sh "$DESK_WEB_URL" "$DESK_API_URL"

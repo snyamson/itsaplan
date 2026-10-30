@@ -104,5 +104,18 @@ The `backup` container turns unhealthy when no backup has succeeded for two days
 Coolify shows a failing backup. Restoring is described in
 [self-hosting.md](self-hosting.md#restoring-from-an-offsite-backup).
 
+## 7. Deploy checks
+
+Before the stack starts, Coolify refuses to deploy while a required variable is empty and
+prints which one, as it does for the backup variables above. The `backup` service also stops
+with a message when `RESTIC_REPOSITORY` still contains a `<placeholder>`.
+
+After a deploy, `scripts/smoke-test.sh <web-url> <api-url>` requests the sign-in page, the api
+root and the auth endpoint from outside and exits non-zero when one of them does not answer.
+It retries for a few minutes, so it can run right after a redeploy. The **Desk smoke test**
+workflow runs it every 30 minutes and can be called from a deploy workflow. Set the repository
+variables `DESK_WEB_URL` and `DESK_API_URL` to the public URLs; without them the workflow
+is skipped.
+
 To run the same stack outside Coolify, see [self-hosting.md](self-hosting.md) or
 [railway.md](railway.md).

@@ -274,6 +274,12 @@ services:
     command:
       - |
         set -eu
+        case "$$RESTIC_REPOSITORY" in
+          *'<'*)
+            echo '[backup] RESTIC_REPOSITORY still has a <placeholder> in it'
+            exit 1
+            ;;
+        esac
         apk add --no-cache restic > /dev/null
         if ! check="$$(restic cat config 2>&1)"; then
           case "$$check" in
