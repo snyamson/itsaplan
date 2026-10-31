@@ -80,8 +80,9 @@ jobs:
           # The fork keeps upstream's tooling files out of the repository: a change upstream
           # makes to one is a modify/delete conflict, and one it adds is staged as new.
           tooling='^(\.agents/|\.claude/|(.*/)?(AGENTS|CLAUDE)\.md$)'
-          git diff --name-only --diff-filter=U | grep -E "$tooling" | xargs -r git rm -q --cached --ignore-unmatch
-          git ls-files | grep -E "$tooling" | xargs -r git rm -q --cached
+          # grep exits 1 when nothing matches, which pipefail would turn into a failed step.
+          git diff --name-only --diff-filter=U | { grep -E "$tooling" || true; } | xargs -r git rm -q --cached --ignore-unmatch
+          git ls-files | { grep -E "$tooling" || true; } | xargs -r git rm -q --cached
 
           conflicts=$(git diff --name-only --diff-filter=U)
           if [ -n "$conflicts" ]; then
