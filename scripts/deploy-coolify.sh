@@ -19,12 +19,16 @@ field() { # field <name>: the first string value with that name in a JSON docume
     grep -o "\"$1\":\"[^\"]*\"" | head -1 | cut -d'"' -f4
 }
 
-api() { # api <path>
-    curl -sS -m 30 -H "Authorization: Bearer $COOLIFY_TOKEN" -H 'Accept: application/json' \
-        -w '\n%{http_code}' "$COOLIFY_URL/api/v1$1"
+api() { # api <method> <path> [curl options]
+    local method="$1" path="$2"
+    shift 2
+    curl -sS -m 30 -X "$method" -H "Authorization: Bearer $COOLIFY_TOKEN" \
+        -H 'Accept: application/json' -H 'Content-Type: application/json' \
+        -w '\n%{http_code}' "$@" "$COOLIFY_URL/api/v1$path"
 }
 
-response="$(api "/deploy?uuid=$COOLIFY_APP_UUID&force=false")"
+response="$(api POST "/deploy?uuid=$COOLIFY_APP_UUID&force=false" \
+    -d "{\"uuid\":\"$COOLIFY_APP_UUID\",\"force\":false}")"
 status="${response##*$'\n'}"
 body="${response%$'\n'*}"
 if [ "$status" != 200 ]; then
@@ -41,7 +45,7 @@ echo "Deployment $deployment queued."
 
 deadline=$((SECONDS + timeout))
 while [ "$SECONDS" -lt "$deadline" ]; do
-    response="$(api "/deployments/$deployment")"
+    response="$(api GET "/deployments/$deployment")"
     status="${response##*$'\n'}"
     body="${response%$'\n'*}"
     if [ "$status" = 200 ]; then
