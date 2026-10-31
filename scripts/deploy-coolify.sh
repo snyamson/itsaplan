@@ -49,7 +49,9 @@ while [ "$SECONDS" -lt "$deadline" ]; do
     status="${response##*$'\n'}"
     body="${response%$'\n'*}"
     if [ "$status" = 200 ]; then
-        state="$(printf '%s' "$body" | field status)"
+        # The response also carries the application's own status (running:healthy), so only
+        # a deployment state counts.
+        state="$(printf '%s' "$body" | grep -oE '"status":"(queued|in_progress|finished|failed|cancelled-by-user)"' | head -1 | cut -d'"' -f4)"
         case "$state" in
             finished)
                 echo "Deployment finished."
@@ -59,6 +61,7 @@ while [ "$SECONDS" -lt "$deadline" ]; do
                 echo "Deployment ended as '$state'. The logs are in Coolify under Deployments."
                 exit 1
                 ;;
+            '') echo "  no deployment status in the answer: $(printf '%s' "$body" | head -c 200)" ;;
             *) echo "  deployment is $state" ;;
         esac
     else
