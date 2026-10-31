@@ -1,3 +1,5 @@
+import { db, project, projectMember, team, teamRole } from '@repo/db';
+import { and, eq, inArray, isNotNull, isNull, or } from 'drizzle-orm';
 import { HttpError } from './lib';
 import {
   getProjectById,
@@ -10,9 +12,15 @@ import {
   getMemberContext,
   getProjectPermissions,
   getTeamPermissions,
+  toMemberContext,
+  type MemberRole,
 } from '#modules/members/service';
 import { getTeamMembership, runsTeam, type TeamStanding } from '#modules/teams/service';
-import { projectWorkspaceGrant, workspaceGrant } from '#modules/workspaces/service';
+import {
+  projectWorkspaceGrant,
+  workspaceGrant,
+  workspaceGrants,
+} from '#modules/workspaces/service';
 import {
   hasPermission,
   emptyPermissions,
@@ -413,4 +421,50 @@ export async function projectsWithPermission(
   return projects
     .filter((entry) => hasPermission(entry.permissions, resource, action))
     .map((entry) => entry.projectId);
+}
+
+// Every project the user reaches, as a member or through their workspace role, where
+// their access holds each permission. mcpOnly keeps the projects open to MCP clients.
+export async function readableProjectIds(
+  userId: string,
+  required: [PermissionResource, PermissionAction][],
+  opts: { mcpOnly?: boolean; includeArchived?: boolean } = {},
+): Promise<number[]> {
+  const grants = await workspaceGrants(userId);
+  const grantedTeams = [...grants.keys()];
+  const rows = await db
+    .select({
+      id: project.id,
+      teamId: project.teamId,
+      role: projectMember.role,
+      permissions: teamRole.permissions,
+    })
+    .from(project)
+    .innerJoin(team, eq(team.id, project.teamId))
+    .leftJoin(
+      projectMember,
+      and(eq(projectMember.projectId, project.id), eq(projectMember.userId, userId)),
+    )
+    .leftJoin(teamRole, eq(teamRole.id, projectMember.roleId))
+    .where(
+      and(
+        opts.includeArchived ? undefined : isNull(project.archivedAt),
+        opts.mcpOnly ? and(eq(project.mcpEnabled, true), eq(team.mcpEnabled, true)) : undefined,
+        or(
+          isNotNull(projectMember.userId),
+          grantedTeams.length ? inArray(project.teamId, grantedTeams) : undefined,
+        ),
+      ),
+    );
+  return rows
+    .filter((row) => {
+      const member = row.role ? toMemberContext(row.role as MemberRole, row.permissions) : null;
+      const access = projectAccess(member, grants.get(row.teamId) ?? null);
+      return (
+        access &&
+        required.every(([resource, action]) => hasPermission(access.permissions, resource, action))
+      );
+    })
+    .map((row) => row.id)
+    .sort((a, b) => a - b);
 }

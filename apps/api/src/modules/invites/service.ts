@@ -1,7 +1,30 @@
-import { db, teamInvite, teamMember, projectMember, teamRole, team, project, user } from '@repo/db';
-import { and, desc, eq, inArray, isNull, lt, sql } from 'drizzle-orm';
+import {
+  db,
+  aiAgent,
+  teamInvite,
+  teamMember,
+  projectMember,
+  teamRole,
+  team,
+  project,
+  user,
+} from '@repo/db';
+import {
+  and,
+  asc,
+  desc,
+  eq,
+  gte,
+  ilike,
+  inArray,
+  isNull,
+  lt,
+  notExists,
+  or,
+  sql,
+} from 'drizzle-orm';
 import { getAuthSettings, inviteValidSince } from '@repo/auth';
-import { HttpError, iso, pgErrorCode } from '#shared/lib';
+import { HttpError, iso, likePattern, pgErrorCode } from '#shared/lib';
 import { getProjectAccess, getTeamAccess } from '#shared/access';
 import { teamRef } from '#modules/teams/ref';
 import { getMembership, type MemberRole } from '#modules/members/service';
@@ -327,6 +350,48 @@ export async function listTeamInvites(teamId: number, issuerId: string): Promise
   return toListed(rows, issuerId);
 }
 
+const INVITE_CANDIDATE_LIMIT = 8;
+// The matches read to find them, since the invite policy may refuse some: a search whose
+// first matches it mostly refuses suggests fewer.
+const INVITE_CANDIDATE_SCAN = 40;
+
+// The whole instance is searched: an invitee is not in the team yet. Only people the team
+// would take an invite for are suggested.
+export async function listInviteCandidates(teamId: number, search: string) {
+  if (!(await getAuthSettings()).inviteSearch) {
+    throw new HttpError(403, 'Searching people is turned off on this instance');
+  }
+  const pattern = likePattern(search);
+  const matches = await db
+    .select({ userId: user.id, name: user.name, email: user.email, image: user.image })
+    .from(user)
+    .where(
+      and(
+        or(ilike(user.name, pattern), ilike(user.email, pattern)),
+        notExists(
+          db
+            .select({ one: sql`1` })
+            .from(teamMember)
+            .where(and(eq(teamMember.teamId, teamId), eq(teamMember.userId, user.id))),
+        ),
+        notExists(
+          db
+            .select({ one: sql`1` })
+            .from(aiAgent)
+            .where(eq(aiAgent.userId, user.id)),
+        ),
+      ),
+    )
+    .orderBy(asc(user.name), asc(user.email))
+    .limit(INVITE_CANDIDATE_SCAN);
+  const candidates: typeof matches = [];
+  for (const match of matches) {
+    if (candidates.length === INVITE_CANDIDATE_LIMIT) break;
+    if (await isInviteEmailAllowed(teamId, match.email, true)) candidates.push(match);
+  }
+  return candidates;
+}
+
 // Removes an invite of the given project. Returns true when one existed. Used to
 // revoke a pending invite or clean up a resolved one.
 export async function deleteProjectInvite(projectId: number, id: number): Promise<boolean> {
@@ -550,4 +615,32 @@ export async function rejectInvite(inviteId: number): Promise<void> {
     .update(teamInvite)
     .set({ status: 'rejected', respondedAt: new Date() })
     .where(eq(teamInvite.id, inviteId));
+}
+
+export async function listReceivedInvites(
+  email: string,
+  window: { limit: number; offset: number },
+) {
+  const since = await inviteValidSince();
+  const where = and(
+    eq(teamInvite.email, normalizeEmail(email)),
+    eq(teamInvite.status, 'pending'),
+    since ? gte(teamInvite.createdAt, since) : undefined,
+  );
+  const [items, counts] = await Promise.all([
+    db
+      .select({ token: teamInvite.token, teamName: team.name, projectName: project.name })
+      .from(teamInvite)
+      .innerJoin(team, eq(team.id, teamInvite.teamId))
+      .leftJoin(project, eq(project.id, teamInvite.projectId))
+      .where(where)
+      .orderBy(desc(teamInvite.createdAt), desc(teamInvite.id))
+      .limit(window.limit)
+      .offset(window.offset),
+    db
+      .select({ total: sql<number>`count(*)::int` })
+      .from(teamInvite)
+      .where(where),
+  ]);
+  return { items, total: counts[0]?.total ?? 0 };
 }

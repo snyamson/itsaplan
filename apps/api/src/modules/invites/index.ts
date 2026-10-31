@@ -1,6 +1,7 @@
 import { Elysia, t } from 'elysia';
 import { mcpTool } from '#mcp/generate';
 import { noContent } from '#shared/http';
+import { paginate } from '#shared/pagination';
 import { authContext } from '#shared/auth-context';
 import { guards } from '#shared/guards';
 import {
@@ -18,6 +19,8 @@ import { getRole } from '#modules/roles/service';
 import type { ProjectRow } from '#modules/projects/service';
 import { teamParams } from '#modules/teams/model';
 import {
+  receivedInvitesQuery,
+  ReceivedInvitePageResponse,
   AcceptInviteResponse,
   InviteCreateResponse,
   InviteEmailResponse,
@@ -25,15 +28,19 @@ import {
   InviteViewResponse,
   createInviteBody,
   createTeamInviteBody,
+  inviteCandidatesQuery,
+  InviteCandidateListResponse,
   inviteParams,
   teamInviteParams,
   tokenParams,
 } from './model';
 import {
+  listReceivedInvites,
   createInvite,
   mayGrantInviteRanks,
   listProjectInvites,
   listTeamInvites,
+  listInviteCandidates,
   type ListedInvite,
   deleteProjectInvite,
   deleteTeamInvite,
@@ -120,6 +127,31 @@ async function hideLinksBeyondGrant(
 export const inviteRoutes = new Elysia({ name: 'invites', detail: { tags: ['Invites'] } })
   .use(authContext)
   .use(guards)
+
+  .get(
+    '/me/invites',
+    async ({ user, query, set }) => {
+      set.headers['cache-control'] = 'private, no-store';
+      return paginate(query, (window) =>
+        listReceivedInvites(requireUser(user).email ?? '', window),
+      );
+    },
+    {
+      beforeHandle: ({ user }) => {
+        requireUser(user);
+        if (!user?.emailVerified || !user.email) {
+          throw new HttpError(403, 'Confirm your email before viewing invitations');
+        }
+      },
+      query: receivedInvitesQuery,
+      response: { 200: ReceivedInvitePageResponse, ...errors(400, 401, 403) },
+      detail: {
+        summary: 'List invitations received by your verified email',
+        description:
+          'Pending, unexpired invitations for the signed-in account. Open an invitation to review its role and explicitly accept or decline it.',
+      },
+    },
+  )
 
   .post(
     '/projects/:projectKey/invites',
@@ -350,6 +382,24 @@ export const inviteRoutes = new Elysia({ name: 'invites', detail: { tags: ['Invi
         description:
           'Every invite into the team, including the ones that also name one of its projects. ' +
           'The token is null on an invite granting a rank only a team owner may grant.',
+      },
+    },
+  )
+
+  .get(
+    '/teams/:teamId/invites/candidates',
+    ({ membership, query }) => listInviteCandidates(membership.teamId, query.search),
+    {
+      teamManager: true,
+      params: teamParams,
+      query: inviteCandidatesQuery,
+      response: { 200: InviteCandidateListResponse, ...commonErrors },
+      detail: {
+        summary: 'Search people to invite to a team',
+        description:
+          'Up to 8 accounts of the instance whose name or address contains the search, ' +
+          'leaving out the members of the team and the AI agents. Whoever may invite to the ' +
+          'team may search, while the instance owner has the search turned on.',
       },
     },
   )

@@ -4,13 +4,9 @@ import { useTranslations } from 'next-intl';
 import { useWorkspaceScimQuery } from '@/services/workspaces.service';
 import SectionPageView from '@/components/common/page/SectionPageView';
 import ListSkeleton from '@/components/common/skeleton/ListSkeleton';
-import WorkspaceScimSettings from './WorkspaceScimSettings';
+import WorkspaceScimSettings from '@/features/teams/components/workspace/scim/WorkspaceScimSettings';
 
-// SCIM provisioning: the token an identity provider authenticates with, and what the
-// groups it pushes grant. Nothing here is a form the owner fills in and saves — the
-// switch and the token act on their own — so there is no page-level Save. The core sets
-// up the instance's SCIM in god mode (GodScimPage); this is the page a hosted build adds
-// to every workspace's settings through `useWorkspaceSections`.
+// Upstream removed its copy of this page; the fork's per-workspace SCIM section renders it.
 export default function WorkspaceScimSection({ workspaceId }: { workspaceId: number }) {
   const t = useTranslations('teams.workspace.scim');
   const settings = useWorkspaceScimQuery(workspaceId).data;
